@@ -1,3 +1,4 @@
+#include <string.h>
 #include "midifile.h"
 #include "byteswap.h"
 
@@ -26,6 +27,9 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   numBytesRead = fread(&header, 1, sizeof(MidiHeaderChunk), p);
 
   if(numBytesRead < sizeof(MidiHeaderChunk))
+    return EMIDI_INVALID_MIDI_FILE;
+
+  if(memcmp(header.pChunk, "MThd", 4) != 0)
     return EMIDI_INVALID_MIDI_FILE;
 
   // Big engian to little endian conversion (make configurable?):

@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 typedef struct MidiHeaderChunk {
-  char chunk[4]; // Must be MThd
+  char pChunk[4]; // Must be MThd
   uint32_t length;
   uint16_t format;
   uint16_t ntrks;
