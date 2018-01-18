@@ -4,18 +4,19 @@
 #include <stdint.h>
 #include <stdio.h>
 
-typedef struct MidiFile {
-  FILE* p;
-  uint32_t size;
-} MidiFile;
-
 typedef struct MidiHeaderChunk {
   char chunk[4]; // Must be MThd
   uint32_t length;
-  uint8_t format;
-  uint8_t ntrks;
-  uint8_t division;  
+  uint16_t format;
+  uint16_t ntrks;
+  uint16_t division;  
 } MidiHeaderChunk;
+
+typedef struct MidiFile {
+  FILE* p;
+  uint32_t size;
+  MidiHeaderChunk header;
+} MidiFile;
 
 typedef uint32_t Error;
 
