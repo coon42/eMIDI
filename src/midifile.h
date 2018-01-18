@@ -27,8 +27,8 @@ enum {
   EMIDI_INVALID_MIDI_FILE = 3
 };
 
-Error eMidi_open(struct MidiFile* pMidiFile, const char* pFileName);
-Error eMidi_close(struct MidiFile* pMidiFile);
+Error eMidi_open(MidiFile* pMidiFile, const char* pFileName);
+Error eMidi_close(MidiFile* pMidiFile);
 
 #endif // _MIDIFILE_H
 

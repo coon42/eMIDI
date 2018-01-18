@@ -1,7 +1,7 @@
 #include "midifile.h"
 #include "byteswap.h"
 
-Error eMidi_open(struct MidiFile* pMidiFile, const char* pFileName) {
+Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(!pMidiFile)
     return EMIDI_INVALID_HANDLE;
 
@@ -42,7 +42,7 @@ Error eMidi_open(struct MidiFile* pMidiFile, const char* pFileName) {
   return EMIDI_OK;
 }
 
-Error eMidi_close(struct MidiFile* pMidiFile) {
+Error eMidi_close(MidiFile* pMidiFile) {
   if(!pMidiFile)
     return EMIDI_INVALID_HANDLE;
 
