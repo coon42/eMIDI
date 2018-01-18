@@ -20,13 +20,33 @@ TEST_CASE("eMidi_open tests", "[open]") {
   SECTION("providing valid object for pMidiFile and file name of invalid MIDI File") {
     MidiFile midi;
 
-    REQUIRE(eMidi_open(&midi, "invalid.mid") == EMIDI_INVALID_MIDI_FILE);
+    REQUIRE(eMidi_open(&midi, "midis/invalid.mid") == EMIDI_INVALID_MIDI_FILE);
   }
 
-  SECTION("providing valid object for pMidiFile and file name of valid MIDI File") {
+  SECTION("providing valid object for pMidiFile and file name of valid MIDI 0 File") {
     MidiFile midi;
 
-    REQUIRE(eMidi_open(&midi, "turkish_march0.mid") == EMIDI_OK);
+    REQUIRE(eMidi_open(&midi, "midis/c4_0.mid") == EMIDI_OK);
   }
+
+// TODO: convert c4_0.mid to Format 1 and Format 2:
+
+/*
+  SECTION("providing valid object for pMidiFile and file name of valid MIDI 1 File") {
+    MidiFile midi;
+
+    REQUIRE(eMidi_open(&midi, "c4_1.mid") == EMIDI_FORMAT_1_NOT_SUPPORTED);
+  }
+
+  SECTION("providing valid object for pMidiFile and file name of valid MIDI 2 File") {
+    MidiFile midi;
+
+    REQUIRE(eMidi_open(&midi, "c4_2.mid") == EMIDI_FORMAT_2_NOT_SUPPORTED);
+  }
+*/
+
+// TODO: 
+// - ntrks must be 1 when format = 0 
+
 }
 
