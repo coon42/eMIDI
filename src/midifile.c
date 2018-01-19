@@ -39,6 +39,12 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   header.division = __bswap_16(header.division);
   // - 
 
+  if(header.length != 6)
+    return EMIDI_INVALID_MIDI_FILE;
+
+  if(header.format > 2)
+    return EMIDI_INVALID_MIDI_FILE;
+
   if(header.format == 1)
     return EMIDI_FORMAT_1_NOT_SUPPORTED;
 

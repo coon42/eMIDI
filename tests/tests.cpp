@@ -47,6 +47,8 @@ TEST_CASE("eMidi_open tests", "[open]") {
 
 // TODO: 
 // - ntrks must be 1 when format = 0 
+// - header size must be 6 (at least for now)
+// - format must not be greater than 2
 
 }
 
