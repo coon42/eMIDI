@@ -1,9 +1,9 @@
 # eMIDI
 MIDI library optimized for beeing used on embedded devices
 
-** This library is in a very early development state and not recommended for use yet! **
+**This library is in a very early development state and not recommended for use yet!**
 
-=== Overall Design Goals ===
+### Overall Design Goals ###
   * The main target are microcontrollers with very limited ressources
 
   * Robust design / does not behave undefined on malformed or broken MIDI files
@@ -18,11 +18,11 @@ MIDI library optimized for beeing used on embedded devices
   * In a later development state MIDI files can also be created. This allows implementing a
     simple sequencer for example.
 
-=== Implemented features so far ===
+### Implemented features so far ###
 
   * Opening and closing of MIDI files and validation of header.
 
-=== Planned ===
+### Planned ###
   * In first iteration only MIDI 0 files are supported. Other formats will also be supported later.
 
   * Basic support MIDI events
