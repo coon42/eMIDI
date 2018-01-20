@@ -26,6 +26,14 @@ static Error prvReadDword(FILE* p, uint32_t* pOut, int* pNumBytesRead) {
   return prvReadVoid(p, pOut, sizeof(uint32_t*), pNumBytesRead);
 }
 
+static uint32_t prvGetFileSize(FILE* p) {
+  fseek(p, 0, SEEK_END);
+  uint32_t fileSize = ftell(p);
+  fseek(p, 0, SEEK_SET);
+
+  return fileSize;
+}
+
 Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(!pMidiFile)
     return EMIDI_INVALID_HANDLE;
@@ -35,11 +43,8 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(!p)
     return EMIDI_CANNOT_OPEN_FILE;
 
-  uint32_t fileSize;
-  fseek(p, 0, SEEK_END);
-  fileSize = ftell(p);
-  fseek(p, 0, SEEK_SET); 
-
+  uint32_t fileSize = prvGetFileSize(p);
+ 
   MidiChunkInfo chunkInfo;
   Error error; 
   int32_t numBytesRead;
