@@ -73,6 +73,9 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(header.format == 2)
     return EMIDI_FORMAT_2_NOT_SUPPORTED;
 
+  if(header.format == 0 && header.ntrks != 1)
+    return EMIDI_INVALID_MIDI_FILE;    
+
   error = prvReadVoid(p, &chunkInfo, sizeof(MidiChunkInfo), &numBytesRead);
 
   if(error)
