@@ -2,8 +2,8 @@
 #include "midifile.h"
 #include "byteswap.h"
 
-static Error prvReadVoid(MidiFile* pMidiFile, void* pOut, int len, int* pNumBytesRead) {
-  int n = fread(pOut, 1, len, pMidiFile->p);
+static Error prvReadVoid(FILE* p, void* pOut, int len, int* pNumBytesRead) {
+  int n = fread(pOut, 1, len, p);
 
   if(pNumBytesRead)
     *pNumBytesRead = n;
@@ -14,16 +14,16 @@ static Error prvReadVoid(MidiFile* pMidiFile, void* pOut, int len, int* pNumByte
   return EMIDI_OK;
 }
 
-static Error prvReadByte(MidiFile* pMidiFile, uint8_t* pOut, int* pNumBytesRead) {
-  return prvReadVoid(pMidiFile, pOut, sizeof(uint8_t), pNumBytesRead);
+static Error prvReadByte(FILE* p, uint8_t* pOut, int* pNumBytesRead) {
+  return prvReadVoid(p, pOut, sizeof(uint8_t), pNumBytesRead);
 }
 
-static Error prvReadWord(MidiFile* pMidiFile, uint16_t* pOut, int* pNumBytesRead) {
-  return prvReadVoid(pMidiFile, pOut, sizeof(uint16_t*), pNumBytesRead);
+static Error prvReadWord(FILE* p, uint16_t* pOut, int* pNumBytesRead) {
+  return prvReadVoid(p, pOut, sizeof(uint16_t*), pNumBytesRead);
 }
 
-static Error prvReadDword(MidiFile* pMidiFile, uint32_t* pOut, int* pNumBytesRead) {
-  return prvReadVoid(pMidiFile, pOut, sizeof(uint32_t*), pNumBytesRead);
+static Error prvReadDword(FILE* p, uint32_t* pOut, int* pNumBytesRead) {
+  return prvReadVoid(p, pOut, sizeof(uint32_t*), pNumBytesRead);
 }
 
 Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
@@ -35,33 +35,27 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(!p)
     return EMIDI_CANNOT_OPEN_FILE;
 
-  // Get file size of midi file:
   uint32_t fileSize;;
   fseek(p, 0, SEEK_END);
   fileSize = ftell(p);
   fseek(p, 0, SEEK_SET); 
 
-  // TODO: improve file validity checks:
-  if(fileSize < sizeof(MidiHeaderChunk))
-    return EMIDI_INVALID_MIDI_FILE;
-
   MidiHeaderChunk header;
   int32_t numBytesRead;
 
-  numBytesRead = fread(&header, 1, sizeof(MidiHeaderChunk), p);
+  Error error; 
+  error = prvReadVoid(p, &header, sizeof(MidiHeaderChunk), &numBytesRead);
 
-  if(numBytesRead < sizeof(MidiHeaderChunk))
-    return EMIDI_INVALID_MIDI_FILE;
+  if(error)
+    return error;
 
   if(memcmp(header.pChunk, "MThd", 4) != 0)
     return EMIDI_INVALID_MIDI_FILE;
 
-  // Big engian to little endian conversion (make configurable?):
   header.length   = __bswap_32(header.length);
   header.format   = __bswap_16(header.format);
   header.ntrks    = __bswap_16(header.ntrks);
   header.division = __bswap_16(header.division);
-  // - 
 
   if(header.length != 6)
     return EMIDI_INVALID_MIDI_FILE;
