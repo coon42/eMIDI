@@ -4,13 +4,18 @@
 #include <stdint.h>
 #include <stdio.h>
 
-typedef struct MidiHeaderChunk {
+typedef struct MidiHeaderDataChunk {
   char pChunk[4]; // Must be MThd
   uint32_t length;
   uint16_t format;
   uint16_t ntrks;
   uint16_t division;  
 } MidiHeaderChunk;
+
+typedef struct MidiTrackDataChunk {
+  char pChunk[4]; // Must be MTrk
+  uint32_t length;  
+} MidiTrackDataChunk;
 
 typedef struct MidiFile {
   FILE* p;
@@ -25,6 +30,7 @@ enum {
   EMIDI_INVALID_HANDLE         = 1,
   EMIDI_CANNOT_OPEN_FILE       = 2,
   EMIDI_INVALID_MIDI_FILE      = 3,
+  EMIDI_UNEXPECTED_END_OF_FILE = 4,
  
 // remove as soon as supported: 
   EMIDI_FORMAT_1_NOT_SUPPORTED = 1000,

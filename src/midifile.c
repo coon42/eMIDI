@@ -2,6 +2,30 @@
 #include "midifile.h"
 #include "byteswap.h"
 
+static Error prvReadVoid(MidiFile* pMidiFile, void* pOut, int len, int* pNumBytesRead) {
+  int n = fread(pOut, 1, len, pMidiFile->p);
+
+  if(pNumBytesRead)
+    *pNumBytesRead = n;
+
+  if(n < len)
+    return EMIDI_UNEXPECTED_END_OF_FILE;
+
+  return EMIDI_OK;
+}
+
+static Error prvReadByte(MidiFile* pMidiFile, uint8_t* pOut, int* pNumBytesRead) {
+  return prvReadVoid(pMidiFile, pOut, sizeof(uint8_t), pNumBytesRead);
+}
+
+static Error prvReadWord(MidiFile* pMidiFile, uint16_t* pOut, int* pNumBytesRead) {
+  return prvReadVoid(pMidiFile, pOut, sizeof(uint16_t*), pNumBytesRead);
+}
+
+static Error prvReadDword(MidiFile* pMidiFile, uint32_t* pOut, int* pNumBytesRead) {
+  return prvReadVoid(pMidiFile, pOut, sizeof(uint32_t*), pNumBytesRead);
+}
+
 Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(!pMidiFile)
     return EMIDI_INVALID_HANDLE;

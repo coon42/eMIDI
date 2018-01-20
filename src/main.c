@@ -3,11 +3,12 @@
 
 const char* getErrorDescription(Error error) {
   switch(error) {
-    case EMIDI_OK:                return "Ok";
-    case EMIDI_INVALID_HANDLE:    return "Invalid Handle";
-    case EMIDI_CANNOT_OPEN_FILE:  return "Cannot open file";
-    case EMIDI_INVALID_MIDI_FILE: return "Invalid MIDI file";
-    default:                      return "Unknown";
+    case EMIDI_OK:                      return "Ok";
+    case EMIDI_INVALID_HANDLE:          return "Invalid Handle";
+    case EMIDI_CANNOT_OPEN_FILE:        return "Cannot open file";
+    case EMIDI_INVALID_MIDI_FILE:       return "Invalid MIDI file";
+    case EMIDI_UNEXPECTED_END_OF_FILE:  return "Unexpected end of File";
+    default:                            return "Unknown";
   }
 }
 
