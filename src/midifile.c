@@ -35,30 +35,34 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(!p)
     return EMIDI_CANNOT_OPEN_FILE;
 
-  uint32_t fileSize;;
+  uint32_t fileSize;
   fseek(p, 0, SEEK_END);
   fileSize = ftell(p);
   fseek(p, 0, SEEK_SET); 
 
-  MidiHeaderChunk header;
+  MidiChunkInfo chunkInfo;
+  Error error; 
   int32_t numBytesRead;
 
-  Error error; 
-  error = prvReadVoid(p, &header, sizeof(MidiHeaderChunk), &numBytesRead);
+  error = prvReadVoid(p, &chunkInfo, sizeof(MidiChunkInfo), &numBytesRead);
 
   if(error)
     return error;
 
-  if(memcmp(header.info.pChunk, "MThd", 4) != 0)
+  if(memcmp(chunkInfo.pChunk, "MThd", 4) != 0)
     return EMIDI_INVALID_MIDI_FILE;
 
-  header.info.length = __bswap_32(header.info.length);
+  chunkInfo.length = __bswap_32(chunkInfo.length);
+
+  if(chunkInfo.length != 6) // Might be change in a future MIDI standard
+    return EMIDI_INVALID_MIDI_FILE;
+
+  MidiHeader header;
+  error = prvReadVoid(p, &header, chunkInfo.length, &numBytesRead);
+
   header.format      = __bswap_16(header.format);
   header.ntrks       = __bswap_16(header.ntrks);
   header.division    = __bswap_16(header.division);
-
-  if(header.info.length != 6)
-    return EMIDI_INVALID_MIDI_FILE;
 
   if(header.format > 2)
     return EMIDI_INVALID_MIDI_FILE;
@@ -69,9 +73,20 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(header.format == 2)
     return EMIDI_FORMAT_2_NOT_SUPPORTED;
 
+  error = prvReadVoid(p, &chunkInfo, sizeof(MidiChunkInfo), &numBytesRead);
+
+  if(error)
+    return error;
+
+  if(memcmp(chunkInfo.pChunk, "MTrk", 4) != 0)
+    return EMIDI_INVALID_MIDI_FILE;
+
   pMidiFile->p = p;
   pMidiFile->size = fileSize;
   pMidiFile->header = header;
+  pMidiFile->track.startPos = ftell(p);
+  pMidiFile->track.pos = ftell(p);
+  pMidiFile->track.len = chunkInfo.length;
 
   return EMIDI_OK;
 }

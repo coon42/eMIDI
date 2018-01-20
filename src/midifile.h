@@ -9,21 +9,23 @@ typedef struct MidiChunkInfo {
   uint32_t length;
 } MidiChunkInfo;
 
-typedef struct MidiHeaderDataChunk {
-  MidiChunkInfo info; // info.pChunk Must be MThd
+typedef struct MidiHeader { 
   uint16_t format;
   uint16_t ntrks;
   uint16_t division;  
-} MidiHeaderChunk;
+} MidiHeader;
 
-typedef struct MidiTrackDataChunk {
-  MidiChunkInfo info; // info.pChunk Must be MTrk
-} MidiTrackDataChunk;
+typedef struct MidiTrack {
+  uint32_t startPos;
+  uint32_t pos;
+  int len;
+} MidiTrack;
 
 typedef struct MidiFile {
   FILE* p;
   uint32_t size;
-  MidiHeaderChunk header;
+  MidiHeader header;
+  MidiTrack track;
 } MidiFile;
 
 typedef uint32_t Error;
