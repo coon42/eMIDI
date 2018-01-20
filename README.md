@@ -31,3 +31,6 @@ MIDI library optimized for beeing used on embedded devices
     * End of Track meta event
     * All other events are ignored in first iteration and will be supported later
 
+### Contraints ###
+  * Only little endian platforms supported
+
