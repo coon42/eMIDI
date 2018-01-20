@@ -21,7 +21,6 @@ void printMidiFileInfo(MidiFile* pMidiFile) {
   printf("\n");
   printf("MIDI header:\n");
   printf("------------\n");
-  printf("Header Length: %d\n", pMidiFile->header.length);
   printf("Format: %d\n", pMidiFile->header.format);
   printf("Number of Tracks: %d\n", pMidiFile->header.ntrks);
   printf("Division: %d", pMidiFile->header.division);  
