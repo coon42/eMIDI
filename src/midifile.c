@@ -103,3 +103,7 @@ Error eMidi_close(MidiFile* pMidiFile) {
   return EMIDI_OK;
 }
 
+Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
+  return EMIDI_OK;
+}
+
