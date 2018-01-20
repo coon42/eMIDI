@@ -49,15 +49,15 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(error)
     return error;
 
-  if(memcmp(header.pChunk, "MThd", 4) != 0)
+  if(memcmp(header.info.pChunk, "MThd", 4) != 0)
     return EMIDI_INVALID_MIDI_FILE;
 
-  header.length   = __bswap_32(header.length);
-  header.format   = __bswap_16(header.format);
-  header.ntrks    = __bswap_16(header.ntrks);
-  header.division = __bswap_16(header.division);
+  header.info.length = __bswap_32(header.info.length);
+  header.format      = __bswap_16(header.format);
+  header.ntrks       = __bswap_16(header.ntrks);
+  header.division    = __bswap_16(header.division);
 
-  if(header.length != 6)
+  if(header.info.length != 6)
     return EMIDI_INVALID_MIDI_FILE;
 
   if(header.format > 2)

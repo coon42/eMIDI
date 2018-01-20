@@ -4,17 +4,20 @@
 #include <stdint.h>
 #include <stdio.h>
 
-typedef struct MidiHeaderDataChunk {
-  char pChunk[4]; // Must be MThd
+typedef struct MidiChunkInfo {
+  char pChunk[4];
   uint32_t length;
+} MidiChunkInfo;
+
+typedef struct MidiHeaderDataChunk {
+  MidiChunkInfo info; // info.pChunk Must be MThd
   uint16_t format;
   uint16_t ntrks;
   uint16_t division;  
 } MidiHeaderChunk;
 
 typedef struct MidiTrackDataChunk {
-  char pChunk[4]; // Must be MTrk
-  uint32_t length;  
+  MidiChunkInfo info; // info.pChunk Must be MTrk
 } MidiTrackDataChunk;
 
 typedef struct MidiFile {
