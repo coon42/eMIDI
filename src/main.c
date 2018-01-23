@@ -40,6 +40,28 @@ static const char* midiEventToStr(int eventCode) {
   }
 }
 
+static const char* metaEventToStr(int metaEventId) {
+  switch(metaEventId) {
+    case MIDI_META_SEQUENCE_NUMBER:     return "Sequence Number";
+    case MIDI_META_TEXT_EVENT:          return "Text Event";
+    case MIDI_META_COPYRIGHT_NOTICE:    return "Copyright Notice";
+    case MIDI_META_SEQUENCE_TRACK_NAME: return "Sequence Track Name";
+    case MIDI_META_INSTRUMENT_NAME:     return "Instrument Name";
+    case MIDI_META_LYRIC:               return "Lyric";
+    case MIDI_META_MARKER:              return "Marker";
+    case MIDI_META_CUE_POINT:           return "Cue Point";
+    case MIDI_META_MIDI_CHANNEL_PREFIX: return "MIDI Channel Prefix";
+    case MIDI_END_OF_TRACK:             return "End of Track";
+    case MIDI_SET_TEMPO:                return "Set Tempo";
+    case MIDI_SMPTE_OFFSET:             return "SMPTE Offset";
+    case MIDI_TIME_SIGNATURE:           return "Time Signature";
+    case MIDI_KEY_SIGNATURE:            return "Key Signature";
+    case MIDI_SEQUENCER_SPECIFIC:       return "Sequencer Specific";
+
+    default:                            return "Unknown";
+  }
+}
+
 static void printError(Error error) {
   printf("Error %d: %s\n", error, getErrorDescription(error));
 }
