@@ -51,6 +51,8 @@ TEST_CASE("eMidi_open tests", "[open]") {
 // - unexpected end of file
 // - No MTrk header after MThd header
 // - No event after MTrk header
+// - End of Track event must appear as last event
+// - The optional events "Sequence Number" and "Sequence Track Name" must appear in tack 0, if used
 
 }
 
