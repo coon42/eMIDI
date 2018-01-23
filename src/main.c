@@ -1,7 +1,6 @@
 #include "midifile.h"
-#include "byteswap.h"
 
-const char* getErrorDescription(Error error) {
+static const char* getErrorDescription(Error error) {
   switch(error) {
     case EMIDI_OK:                      return "Ok";
     case EMIDI_INVALID_HANDLE:          return "Invalid Handle";
@@ -12,18 +11,60 @@ const char* getErrorDescription(Error error) {
   }
 }
 
-void printError(Error error) {
+static const char* midiEventToStr(int eventCode) {
+  switch(eventCode) {
+    case MIDI_EVENT_NOTE_ON:                 return "Note-Off";
+    case MIDI_EVENT_NOTE_OFF:                return "Note-On";
+    case MIDI_EVENT_POLY_KEY_PRESSURE:       return "Poly Key Pressure";
+    case MIDI_EVENT_CONTROL_CHANGE:          return "Control Change";
+    case MIDI_EVENT_PROGRAM_CHANGE:          return "Program Change";
+    case MIDI_EVENT_CHANNEL_PRESSURE:        return "Channel Pressure";
+    case MIDI_EVENT_PITCH_BEND:              return "Pitch Bend";
+    case MIDI_EVENT_META:                    return "Meta Event";
+    case MIDI_EVENT_SYSTEM_EXCLUSIVE:        return "System Exclusive";
+    case MIDI_EVENT_TIME_CODE_QUARTER_FRAME: return "MIDI Time Code Quarter Frame";
+    case MIDI_EVENT_SONG_POSITION_POINTER:   return "Song Position Pointer";
+    case MIDI_EVENT_SONG_SELECT:             return "Song Select";
+    case MIDI_EVENT_TUNE_REQUEST:            return "Tune Request";
+    case MIDI_EVENT_END_OF_EXCLUSIVE:        return "EOX (End of Exclusive)";
+    case MIDI_EVENT_TIMING_CLOCK:            return "Real Time Timing Clock";
+    case MIDI_EVENT_START:                   return "Real Time Start";
+    case MIDI_EVENT_CONTINUE:                return "Real Time Continue";
+    case MIDI_EVENT_STOP:                    return "Real Time Stop";
+    case MIDI_EVENT_ACTIVE_SENSING:          return "Real Time Active Sensing";
+
+    // TODO: following event collides with meta event!?
+    // case MIDI_EVENT_SYSTEM_RESET:            "Real Time System Reset";
+
+    default:                                 return "Unknown";
+  }
+}
+
+static void printError(Error error) {
   printf("Error %d: %s\n", error, getErrorDescription(error));
 }
 
-void printMidiFileInfo(MidiFile* pMidiFile) {
+static void printMidiFileInfo(MidiFile* pMidiFile) {
   printf("File size: %d bytes\n", pMidiFile->size);
   printf("\n");
   printf("MIDI header:\n");
   printf("------------\n");
   printf("Format: %d\n", pMidiFile->header.format);
   printf("Number of Tracks: %d\n", pMidiFile->header.ntrks);
-  printf("Division: %d", pMidiFile->header.division);  
+  printf("Division: %d\n", pMidiFile->header.division);
+  printf("\n");
+}
+
+static void printMidiFileEvents(MidiFile* pMidiFile) {
+  printf("Now reading MIDI events:\n");
+
+  MidiEvent event;
+  Error error;
+
+  do {
+    error = eMidi_readEvent(pMidiFile, &event); 
+    
+  } while (error == EMIDI_OK);
 }
 
 int main(int argc, char* pArgv[]) {
@@ -48,6 +89,12 @@ int main(int argc, char* pArgv[]) {
 
   printf("Midi file '%s' opened successfully!\n", pMidiFileName);
   printMidiFileInfo(&midi);
+
+  MidiEvent e;
+  eMidi_readEvent(&midi, &e);
+
+  printf("Next event is: 0x%02X (%s)\n", e.eventId,
+    midiEventToStr(e.eventId));
 
   eMidi_close(&midi);
 
