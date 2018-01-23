@@ -73,6 +73,25 @@ enum SystemRealTimeMessages {
   MIDI_EVENT_SYSTEM_RESET   = 0xFF
 };
 
+enum MetaEvents {
+  MIDI_META_SEQUENCE_NUMBER     = 0x00,
+  MIDI_META_TEXT_EVENT          = 0x01,
+  MIDI_META_COPYRIGHT_NOTICE    = 0x02,
+  MIDI_META_SEQUENCE_TRACK_NAME = 0x03,
+  MIDI_META_INSTRUMENT_NAME     = 0x04,
+  MIDI_META_LYRIC               = 0x05,
+  MIDI_META_MARKER              = 0x06,
+  MIDI_META_CUE_POINT           = 0x07,
+  // 0x08 .. 0x0F reserved
+  MIDI_META_MIDI_CHANNEL_PREFIX = 0x20,
+  MIDI_END_OF_TRACK             = 0x2F,
+  MIDI_SET_TEMPO                = 0x51,
+  MIDI_SMPTE_OFFSET             = 0x54,
+  MIDI_TIME_SIGNATURE           = 0x58,
+  MIDI_KEY_SIGNATURE            = 0x59,
+  MIDI_SEQUENCER_SPECIFIC       = 0x7F
+};
+
 typedef uint32_t Error;
 
 enum {
