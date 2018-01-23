@@ -108,7 +108,21 @@ Error eMidi_close(MidiFile* pMidiFile) {
   return EMIDI_OK;
 }
 
-Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
+Error eMidi_readEvent(const MidiFile* pMidiFile, MidiEvent* pEvent) {  
+  Error error;
+
+  uint8_t tmp;
+  uint8_t eventId;
+
+  // TODO: read var length:
+  if(error = prvReadByte(pMidiFile->p, &tmp, NULL))
+    return error;
+
+  pEvent->deltaTime = tmp;
+
+  if(error = prvReadByte(pMidiFile->p, &pEvent->eventId, NULL))
+    return error;
+
   return EMIDI_OK;
 }
 
