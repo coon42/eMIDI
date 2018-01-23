@@ -2,6 +2,15 @@
 #include "midifile.h"
 #include "byteswap.h"
 
+static Error prvSkipBytes(FILE* p, int len) {
+  int pos = ftell(p);
+
+  if(fseek(p, len, SEEK_CUR))
+    return EMIDI_UNEXPECTED_END_OF_FILE;
+
+  return EMIDI_OK;
+}
+
 static Error prvReadVoid(FILE* p, void* pOut, int len, int* pNumBytesRead) {
   int n = fread(pOut, 1, len, p);
 
@@ -111,18 +120,48 @@ Error eMidi_close(MidiFile* pMidiFile) {
 Error eMidi_readEvent(const MidiFile* pMidiFile, MidiEvent* pEvent) {  
   Error error;
 
-  uint8_t tmp;
+  uint8_t len;
   uint8_t eventId;
 
   // TODO: read var length:
-  if(error = prvReadByte(pMidiFile->p, &tmp, NULL))
+  if(error = prvReadByte(pMidiFile->p, &len, NULL))
     return error;
 
-  pEvent->deltaTime = tmp;
+  pEvent->deltaTime = len;
 
   if(error = prvReadByte(pMidiFile->p, &pEvent->eventId, NULL))
     return error;
 
+  if(pEvent->eventId == MIDI_EVENT_META) {
+    if(error = prvReadByte(pMidiFile->p, &pEvent->metaEventId, NULL))
+      return error;
+
+    // Ignore event for now:
+    if(error = prvReadByte(pMidiFile->p, &pEvent->metaEventLen, NULL))
+      return error;
+
+    if(error = prvSkipBytes(pMidiFile->p, pEvent->metaEventLen))
+      return error;
+  }
+  else {
+    int numDataBytes = 0;
+
+    switch(pEvent->eventId) {
+      case MIDI_EVENT_NOTE_ON:           numDataBytes = 2; break;
+      case MIDI_EVENT_NOTE_OFF:          numDataBytes = 2; break;
+      case MIDI_EVENT_POLY_KEY_PRESSURE: numDataBytes = 2; break;
+      case MIDI_EVENT_CONTROL_CHANGE:    numDataBytes = 2; break;
+      case MIDI_EVENT_PROGRAM_CHANGE:    numDataBytes = 1; break;
+      case MIDI_EVENT_CHANNEL_PRESSURE:  numDataBytes = 1; break;
+      case MIDI_EVENT_PITCH_BEND:        numDataBytes = 2; break;
+
+      default:
+        return EMIDI_FEATURE_NOT_IMPLEMENTED;
+    }
+
+    prvSkipBytes(pMidiFile->p, numDataBytes);
+  }
+ 
   return EMIDI_OK;
 }
 

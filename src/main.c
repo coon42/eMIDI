@@ -1,12 +1,16 @@
 #include "midifile.h"
 
-static const char* getErrorDescription(Error error) {
+static const char* errorToStr(Error error) {
   switch(error) {
     case EMIDI_OK:                      return "Ok";
     case EMIDI_INVALID_HANDLE:          return "Invalid Handle";
     case EMIDI_CANNOT_OPEN_FILE:        return "Cannot open file";
     case EMIDI_INVALID_MIDI_FILE:       return "Invalid MIDI file";
     case EMIDI_UNEXPECTED_END_OF_FILE:  return "Unexpected end of File";
+    case EMIDI_FEATURE_NOT_IMPLEMENTED: return "Feature not implemented";
+    case EMIDI_FORMAT_1_NOT_SUPPORTED:  return "Format 1 not supportd";
+    case EMIDI_FORMAT_2_NOT_SUPPORTED:  return "Format 2 not supportd";
+
     default:                            return "Unknown";
   }
 }
@@ -63,7 +67,7 @@ static const char* metaEventToStr(int metaEventId) {
 }
 
 static void printError(Error error) {
-  printf("Error %d: %s\n", error, getErrorDescription(error));
+  printf("Error %d: %s\n", error, errorToStr(error));
 }
 
 static void printMidiFileInfo(MidiFile* pMidiFile) {
@@ -79,13 +83,24 @@ static void printMidiFileInfo(MidiFile* pMidiFile) {
 
 static void printMidiFileEvents(MidiFile* pMidiFile) {
   printf("Now reading MIDI events:\n");
-
-  MidiEvent event;
+  printf("========================\n\n");
+  MidiEvent e;
   Error error;
 
   do {
-    error = eMidi_readEvent(pMidiFile, &event); 
-    
+    if(error = eMidi_readEvent(pMidiFile, &e)) {
+      printf("Error on reading event: %d (%s)\n", error, errorToStr(error));
+      return;
+    }
+
+    printf("Next event is: 0x%02X (%s)", e.eventId,
+        midiEventToStr(e.eventId));
+
+    if(e.eventId == MIDI_EVENT_META)
+      printf(" - %s", metaEventToStr(e.metaEventId));
+  
+    printf("\n");
+ 
   } while (error == EMIDI_OK);
 }
 
@@ -111,12 +126,7 @@ int main(int argc, char* pArgv[]) {
 
   printf("Midi file '%s' opened successfully!\n", pMidiFileName);
   printMidiFileInfo(&midi);
-
-  MidiEvent e;
-  eMidi_readEvent(&midi, &e);
-
-  printf("Next event is: 0x%02X (%s)\n", e.eventId,
-    midiEventToStr(e.eventId));
+  printMidiFileEvents(&midi);
 
   eMidi_close(&midi);
 

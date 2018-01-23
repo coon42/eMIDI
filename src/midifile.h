@@ -31,11 +31,8 @@ typedef struct MidiFile {
 typedef struct MidiEvent {
   uint32_t deltaTime;
   uint8_t eventId;
-
-  union {
-  
-  } event;
-
+  uint8_t metaEventId;
+  uint8_t metaEventLen;
 } MidiEvent;
 
 enum MidiVoiceMessages {
@@ -102,9 +99,10 @@ enum {
   EMIDI_UNEXPECTED_END_OF_FILE = 4,
   EMIDI_END_OF_FILE            = 5,
  
-// remove as soon as supported: 
-  EMIDI_FORMAT_1_NOT_SUPPORTED = 1000,
-  EMIDI_FORMAT_2_NOT_SUPPORTED = 1001
+// remove as soon as supported:
+  EMIDI_FEATURE_NOT_IMPLEMENTED = 1000, 
+  EMIDI_FORMAT_1_NOT_SUPPORTED  = 1001,
+  EMIDI_FORMAT_2_NOT_SUPPORTED  = 1002
 };
 
 Error eMidi_open(MidiFile* pMidiFile, const char* pFileName);
