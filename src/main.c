@@ -101,7 +101,7 @@ static void printMidiFileEvents(MidiFile* pMidiFile) {
   
     printf("\n");
  
-  } while (error == EMIDI_OK);
+  } while (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
 }
 
 int main(int argc, char* pArgv[]) {

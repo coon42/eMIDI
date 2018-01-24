@@ -35,6 +35,30 @@ static Error prvReadDword(FILE* p, uint32_t* pOut, int* pNumBytesRead) {
   return prvReadVoid(p, pOut, sizeof(uint32_t*), pNumBytesRead);
 }
 
+static Error prvReadVarLen(FILE* p, uint32_t* pLen) {
+  Error error;
+  uint32_t value;
+  uint8_t c;
+
+  if(error = prvReadByte(p, &c, NULL))
+    return error;
+
+  if(value = c & 0x80) {
+    value &= 0x7f;
+
+    do {
+      if(error = prvReadByte(p, &c, NULL))
+        return error;
+
+      value = (value << 7) + (c & 0x7f);
+    } while (c & 0x80);
+  }
+
+  *pLen = value;
+
+  return EMIDI_OK;
+}
+
 static uint32_t prvGetFileSize(FILE* p) {
   fseek(p, 0, SEEK_END);
   uint32_t fileSize = ftell(p);
@@ -58,9 +82,7 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   Error error; 
   int32_t numBytesRead;
 
-  error = prvReadVoid(p, &chunkInfo, sizeof(MidiChunkInfo), &numBytesRead);
-
-  if(error)
+  if(error = prvReadVoid(p, &chunkInfo, sizeof(MidiChunkInfo), &numBytesRead))
     return error;
 
   if(memcmp(chunkInfo.pChunk, "MThd", 4) != 0)
@@ -74,9 +96,9 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   MidiHeader header;
   error = prvReadVoid(p, &header, chunkInfo.length, &numBytesRead);
 
-  header.format      = __bswap_16(header.format);
-  header.ntrks       = __bswap_16(header.ntrks);
-  header.division    = __bswap_16(header.division);
+  header.format   = __bswap_16(header.format);
+  header.ntrks    = __bswap_16(header.ntrks);
+  header.division = __bswap_16(header.division);
 
   if(header.format > 2)
     return EMIDI_INVALID_MIDI_FILE;
@@ -90,9 +112,7 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(header.format == 0 && header.ntrks != 1)
     return EMIDI_INVALID_MIDI_FILE;    
 
-  error = prvReadVoid(p, &chunkInfo, sizeof(MidiChunkInfo), &numBytesRead);
-
-  if(error)
+  if(error = prvReadVoid(p, &chunkInfo, sizeof(MidiChunkInfo), &numBytesRead))
     return error;
 
   if(memcmp(chunkInfo.pChunk, "MTrk", 4) != 0)
@@ -120,14 +140,8 @@ Error eMidi_close(MidiFile* pMidiFile) {
 Error eMidi_readEvent(const MidiFile* pMidiFile, MidiEvent* pEvent) {  
   Error error;
 
-  uint8_t len;
-  uint8_t eventId;
-
-  // TODO: read var length:
-  if(error = prvReadByte(pMidiFile->p, &len, NULL))
+  if(error = prvReadVarLen(pMidiFile->p, &pEvent->deltaTime))
     return error;
-
-  pEvent->deltaTime = len;
 
   if(error = prvReadByte(pMidiFile->p, &pEvent->eventId, NULL))
     return error;
@@ -136,10 +150,10 @@ Error eMidi_readEvent(const MidiFile* pMidiFile, MidiEvent* pEvent) {
     if(error = prvReadByte(pMidiFile->p, &pEvent->metaEventId, NULL))
       return error;
 
-    // Ignore event for now:
     if(error = prvReadByte(pMidiFile->p, &pEvent->metaEventLen, NULL))
       return error;
 
+    // Ignore meta events for now:
     if(error = prvSkipBytes(pMidiFile->p, pEvent->metaEventLen))
       return error;
   }
