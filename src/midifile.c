@@ -160,7 +160,7 @@ Error eMidi_readEvent(const MidiFile* pMidiFile, MidiEvent* pEvent) {
   else {
     int numDataBytes = 0;
 
-    switch(pEvent->eventId) {
+    switch(pEvent->eventId & 0xF0) {
       case MIDI_EVENT_NOTE_ON:           numDataBytes = 2; break;
       case MIDI_EVENT_NOTE_OFF:          numDataBytes = 2; break;
       case MIDI_EVENT_POLY_KEY_PRESSURE: numDataBytes = 2; break;

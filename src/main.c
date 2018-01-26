@@ -16,7 +16,10 @@ static const char* errorToStr(Error error) {
 }
 
 static const char* midiEventToStr(int eventCode) {
-  switch(eventCode) {
+  uint8_t code = eventCode & 0xF0;
+  uint8_t ch   = eventCode & 0x0F;;
+
+  switch(code) {
     case MIDI_EVENT_NOTE_ON:                 return "Note-Off";
     case MIDI_EVENT_NOTE_OFF:                return "Note-On";
     case MIDI_EVENT_POLY_KEY_PRESSURE:       return "Poly Key Pressure";
@@ -89,15 +92,15 @@ static void printMidiFileEvents(MidiFile* pMidiFile) {
 
   do {
     if(error = eMidi_readEvent(pMidiFile, &e)) {
-      printf("Error on reading event: %d (%s)\n", error, errorToStr(error));
+      printf("Error on reading event: [0x%02X] (Error %d: %s)\n",e.eventId, error, errorToStr(error));
       return;
     }
 
-    printf("Next event is: 0x%02X (%s)", e.eventId,
+    printf("Next event is: [0x%02X] %s", e.eventId,
         midiEventToStr(e.eventId));
 
     if(e.eventId == MIDI_EVENT_META)
-      printf(" - %s", metaEventToStr(e.metaEventId));
+      printf(" - [0x%02x] %s", e.metaEventId, metaEventToStr(e.metaEventId));
   
     printf("\n");
  
