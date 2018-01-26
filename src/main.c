@@ -15,11 +15,11 @@ static const char* errorToStr(Error error) {
   }
 }
 
-static const char* midiEventToStr(int eventCode) {
-  uint8_t code = eventCode & 0xF0;
-  uint8_t ch   = eventCode & 0x0F;;
+static const char* midiEventToStr(uint8_t eventCode) {
+  uint8_t channelMessage = eventCode & 0xF0;
+  uint8_t systemMessage  = eventCode;
 
-  switch(code) {
+  switch(channelMessage) {
     case MIDI_EVENT_NOTE_ON:                 return "Note-Off";
     case MIDI_EVENT_NOTE_OFF:                return "Note-On";
     case MIDI_EVENT_POLY_KEY_PRESSURE:       return "Poly Key Pressure";
@@ -27,6 +27,9 @@ static const char* midiEventToStr(int eventCode) {
     case MIDI_EVENT_PROGRAM_CHANGE:          return "Program Change";
     case MIDI_EVENT_CHANNEL_PRESSURE:        return "Channel Pressure";
     case MIDI_EVENT_PITCH_BEND:              return "Pitch Bend";
+  }
+
+  switch(systemMessage) {
     case MIDI_EVENT_META:                    return "Meta Event";
     case MIDI_EVENT_SYSTEM_EXCLUSIVE:        return "System Exclusive";
     case MIDI_EVENT_TIME_CODE_QUARTER_FRAME: return "MIDI Time Code Quarter Frame";
