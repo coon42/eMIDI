@@ -29,6 +29,18 @@ TEST_CASE("eMidi_open tests", "[open]") {
     REQUIRE(eMidi_open(&midi, "midis/c4_0.mid") == EMIDI_OK);
   }
 
+  SECTION("Complete parsing of turkish_match0.mid without any error") {
+    MidiFile midi;
+    REQUIRE(eMidi_open(&midi, "midis/turkish_march0.mid") == EMIDI_OK);
+
+    Error eror;
+    MidiEvent e;
+
+    do {
+      REQUIRE(eMidi_readEvent(&midi, &e) == EMIDI_OK);
+    } while (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
+  }
+
 // TODO: convert c4_0.mid to Format 1 and Format 2:
 
 /*
@@ -53,6 +65,7 @@ TEST_CASE("eMidi_open tests", "[open]") {
 // - No event after MTrk header
 // - End of Track event must appear as last event
 // - The optional events "Sequence Number" and "Sequence Track Name" must appear in tack 0, if used
-
+// - Start a sysex message F0 but never terminate it with F7
+ 
 }
 
