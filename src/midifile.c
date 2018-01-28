@@ -169,8 +169,19 @@ Error eMidi_readEvent(const MidiFile* pMidiFile, MidiEvent* pEvent) {
   // Now Check for System Messages:
 
   switch(pEvent->eventId) {
-    case MIDI_EVENT_SYSTEM_EXCLUSIVE: 
+    case MIDI_EVENT_SYSTEM_EXCLUSIVE: {
+      // Ignore all bytes until 0xF7 (EOX byte):
+ 
+      uint8_t dataByte;
+
+      do {
+       if(error = prvReadByte(pMidiFile->p, &dataByte, NULL))
+        return error;
+
+      } while(dataByte != 0xF7);
+
       break;
+    }
 
     case MIDI_EVENT_META: {
       if(error = prvReadByte(pMidiFile->p, &pEvent->metaEventId, NULL))
@@ -183,6 +194,7 @@ Error eMidi_readEvent(const MidiFile* pMidiFile, MidiEvent* pEvent) {
       if(error = prvSkipBytes(pMidiFile->p, pEvent->metaEventLen))
         return error;
 
+      // CHECKME: can META events be used for running status?
       break;
     }
 
@@ -190,7 +202,7 @@ Error eMidi_readEvent(const MidiFile* pMidiFile, MidiEvent* pEvent) {
     default:
       return EMIDI_FEATURE_NOT_IMPLEMENTED;
   }
-     
+   
   return EMIDI_OK;
 }
 
