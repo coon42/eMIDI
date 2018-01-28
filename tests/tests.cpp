@@ -41,6 +41,19 @@ TEST_CASE("eMidi_open tests", "[open]") {
     } while (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
   }
 
+  SECTION("Complete parsing of vivaldi_spring0.mid without any error") {
+    MidiFile midi;
+    REQUIRE(eMidi_open(&midi, "midis/vivaldi_spring0.mid") == EMIDI_OK);
+
+    Error eror;
+    MidiEvent e;
+
+    do {
+      REQUIRE(eMidi_readEvent(&midi, &e) == EMIDI_OK);
+    } while (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
+  }
+
+
 // TODO: convert c4_0.mid to Format 1 and Format 2:
 
 /*
