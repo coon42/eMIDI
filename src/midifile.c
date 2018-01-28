@@ -170,7 +170,7 @@ Error eMidi_readEvent(const MidiFile* pMidiFile, MidiEvent* pEvent) {
 
   switch(pEvent->eventId) {
     case MIDI_EVENT_SYSTEM_EXCLUSIVE: {
-      // Ignore all bytes until 0xF7 (EOX byte):
+      // Ignore all bytes until EOX byte (0xF7):
  
       uint8_t dataByte;
 
@@ -178,7 +178,7 @@ Error eMidi_readEvent(const MidiFile* pMidiFile, MidiEvent* pEvent) {
        if(error = prvReadByte(pMidiFile->p, &dataByte, NULL))
         return error;
 
-      } while(dataByte != 0xF7);
+      } while(dataByte != MIDI_EVENT_END_OF_EXCLUSIVE);
 
       break;
     }
