@@ -146,36 +146,51 @@ Error eMidi_readEvent(const MidiFile* pMidiFile, MidiEvent* pEvent) {
   if(error = prvReadByte(pMidiFile->p, &pEvent->eventId, NULL))
     return error;
 
-  if(pEvent->eventId == MIDI_EVENT_META) {
-    if(error = prvReadByte(pMidiFile->p, &pEvent->metaEventId, NULL))
-      return error;
+  int numDataBytes = 0;
 
-    if(error = prvReadByte(pMidiFile->p, &pEvent->metaEventLen, NULL))
-      return error;
+  // Fist check for channel messages:
 
-    // Ignore meta events for now:
-    if(error = prvSkipBytes(pMidiFile->p, pEvent->metaEventLen))
-      return error;
+  switch(pEvent->eventId & 0xF0) {
+    case MIDI_EVENT_NOTE_ON:           numDataBytes = 2; break;
+    case MIDI_EVENT_NOTE_OFF:          numDataBytes = 2; break;
+    case MIDI_EVENT_POLY_KEY_PRESSURE: numDataBytes = 2; break;
+    case MIDI_EVENT_CONTROL_CHANGE:    numDataBytes = 2; break;
+    case MIDI_EVENT_PROGRAM_CHANGE:    numDataBytes = 1; break;
+    case MIDI_EVENT_CHANNEL_PRESSURE:  numDataBytes = 1; break;
+    case MIDI_EVENT_PITCH_BEND:        numDataBytes = 2; break;    
   }
-  else {
-    int numDataBytes = 0;
 
-    switch(pEvent->eventId & 0xF0) {
-      case MIDI_EVENT_NOTE_ON:           numDataBytes = 2; break;
-      case MIDI_EVENT_NOTE_OFF:          numDataBytes = 2; break;
-      case MIDI_EVENT_POLY_KEY_PRESSURE: numDataBytes = 2; break;
-      case MIDI_EVENT_CONTROL_CHANGE:    numDataBytes = 2; break;
-      case MIDI_EVENT_PROGRAM_CHANGE:    numDataBytes = 1; break;
-      case MIDI_EVENT_CHANNEL_PRESSURE:  numDataBytes = 1; break;
-      case MIDI_EVENT_PITCH_BEND:        numDataBytes = 2; break;
+  if(numDataBytes) {
+    prvSkipBytes(pMidiFile->p, numDataBytes);
 
-      default:
-        return EMIDI_FEATURE_NOT_IMPLEMENTED;
+    return EMIDI_OK;
+  }
+
+  // Now Check for System Messages:
+
+  switch(pEvent->eventId) {
+    case MIDI_EVENT_SYSTEM_EXCLUSIVE: 
+      break;
+
+    case MIDI_EVENT_META: {
+      if(error = prvReadByte(pMidiFile->p, &pEvent->metaEventId, NULL))
+        return error;
+
+      if(error = prvReadByte(pMidiFile->p, &pEvent->metaEventLen, NULL))
+        return error;
+
+      // Ignore meta events for now:
+      if(error = prvSkipBytes(pMidiFile->p, pEvent->metaEventLen))
+        return error;
+
+      break;
     }
 
-    prvSkipBytes(pMidiFile->p, numDataBytes);
+    // TODO: check for additional events which can occur in MIDI files:
+    default:
+      return EMIDI_FEATURE_NOT_IMPLEMENTED;
   }
- 
+     
   return EMIDI_OK;
 }
 
