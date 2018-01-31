@@ -8,8 +8,8 @@ static const char* errorToStr(Error error) {
     case EMIDI_INVALID_MIDI_FILE:       return "Invalid MIDI file";
     case EMIDI_UNEXPECTED_END_OF_FILE:  return "Unexpected end of File";
     case EMIDI_FEATURE_NOT_IMPLEMENTED: return "Feature not implemented";
-    case EMIDI_FORMAT_1_NOT_SUPPORTED:  return "Format 1 not supportd";
-    case EMIDI_FORMAT_2_NOT_SUPPORTED:  return "Format 2 not supportd";
+    case EMIDI_FORMAT_1_NOT_SUPPORTED:  return "Format 1 not supported";
+    case EMIDI_FORMAT_2_NOT_SUPPORTED:  return "Format 2 not supported";
 
     default:                            return "Unknown";
   }
