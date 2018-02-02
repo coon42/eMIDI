@@ -26,6 +26,7 @@ typedef struct MidiFile {
   uint32_t size;
   MidiHeader header;
   MidiTrack track;
+  uint8_t prevEventId;
 } MidiFile;
 
 typedef struct MidiEvent {
@@ -107,7 +108,7 @@ enum {
 
 Error eMidi_open(MidiFile* pMidiFile, const char* pFileName);
 Error eMidi_close(MidiFile* pMidiFile);
-Error eMidi_readEvent(const MidiFile* pMidiFile, MidiEvent* pEvent);
+Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent);
 
 #endif // _MIDIFILE_H
 

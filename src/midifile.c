@@ -124,6 +124,7 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   pMidiFile->track.startPos = ftell(p);
   pMidiFile->track.pos = ftell(p);
   pMidiFile->track.len = chunkInfo.length;
+  pMidiFile->prevEventId = 0;
 
   return EMIDI_OK;
 }
@@ -137,7 +138,7 @@ Error eMidi_close(MidiFile* pMidiFile) {
   return EMIDI_OK;
 }
 
-Error eMidi_readEvent(const MidiFile* pMidiFile, MidiEvent* pEvent) {  
+Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {  
   Error error;
 
   if(error = prvReadVarLen(pMidiFile->p, &pEvent->deltaTime))
@@ -146,9 +147,18 @@ Error eMidi_readEvent(const MidiFile* pMidiFile, MidiEvent* pEvent) {
   if(error = prvReadByte(pMidiFile->p, &pEvent->eventId, NULL))
     return error;
 
+  if(pEvent->eventId & 0x80) 
+    pMidiFile->prevEventId = pEvent->eventId;
+  else { 
+    pEvent->eventId = pMidiFile->prevEventId;
+
+    // TODO: do not first data byte again. Skip second read instead:
+    fseek(pMidiFile->p, -1, SEEK_CUR);
+  }
+
   int numDataBytes = 0;
 
-  // Fist check for channel messages:
+  // First check for channel messages:
 
   switch(pEvent->eventId & 0xF0) {
     case MIDI_EVENT_NOTE_ON:           numDataBytes = 2; break;
