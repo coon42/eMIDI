@@ -22,6 +22,7 @@ MIDI library optimized for beeing used on embedded devices
 
   * Opening and closing of MIDI files and validation of header.
   * Reading of all midi events of any midi0 file (data bytes are ignored / running status does not work yet)
+  * Support of running status events
 
 ### Planned ###
   * In first iteration only MIDI 0 files are supported. Other formats will also be supported later.
@@ -31,9 +32,7 @@ MIDI library optimized for beeing used on embedded devices
     * NoteOff
     * End of Track meta event
     * All other events are ignored in first iteration and will be supported later
-
-  * Support of running status
-  
+ 
 ### Contraints ###
   * Only little endian platforms supported
 
