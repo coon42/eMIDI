@@ -152,7 +152,7 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
   else { 
     pEvent->eventId = pMidiFile->prevEventId;
 
-    // TODO: do not first data byte again. Skip second read instead:
+    // TODO: do not read first data byte again. Skip second read instead:
     fseek(pMidiFile->p, -1, SEEK_CUR);
   }
 
