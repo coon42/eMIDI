@@ -93,6 +93,8 @@ TEST_CASE("eMidi_open tests", "[open]") {
 // - End of Track event must appear as last event
 // - The optional events "Sequence Number" and "Sequence Track Name" must appear in tack 0, if used
 // - Start a sysex message F0 but never terminate it with F7
- 
+// - running status event tests:
+// -   only allow running status for voice and mode messages only
+
 }
 
