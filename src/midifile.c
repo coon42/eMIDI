@@ -77,9 +77,9 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
     return EMIDI_CANNOT_OPEN_FILE;
 
   uint32_t fileSize = prvGetFileSize(p);
- 
+
   MidiChunkInfo chunkInfo;
-  Error error; 
+  Error error;
   int32_t numBytesRead;
 
   if(error = prvReadVoid(p, &chunkInfo, sizeof(MidiChunkInfo), &numBytesRead))
@@ -110,7 +110,7 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
     return EMIDI_FORMAT_2_NOT_SUPPORTED;
 
   if(header.format == 0 && header.ntrks != 1)
-    return EMIDI_INVALID_MIDI_FILE;    
+    return EMIDI_INVALID_MIDI_FILE;
 
   if(error = prvReadVoid(p, &chunkInfo, sizeof(MidiChunkInfo), &numBytesRead))
     return error;
@@ -138,7 +138,7 @@ Error eMidi_close(MidiFile* pMidiFile) {
   return EMIDI_OK;
 }
 
-Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {  
+Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
   Error error;
 
   if(error = prvReadVarLen(pMidiFile->p, &pEvent->deltaTime))
@@ -147,31 +147,39 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
   if(error = prvReadByte(pMidiFile->p, &pEvent->eventId, NULL))
     return error;
 
-  if(pEvent->eventId & 0x80) 
+  if(pEvent->eventId & 0x80)
     pMidiFile->prevEventId = pEvent->eventId;
-  else { 
+  else {
     pEvent->eventId = pMidiFile->prevEventId;
 
     // TODO: do not read first data byte again. Skip second read instead:
     fseek(pMidiFile->p, -1, SEEK_CUR);
   }
 
-  int numDataBytes = 0;
+  int skipBytes = 0;
 
   // First check for channel messages:
 
   switch(pEvent->eventId & 0xF0) {
-    case MIDI_EVENT_NOTE_ON:           numDataBytes = 2; break;
-    case MIDI_EVENT_NOTE_OFF:          numDataBytes = 2; break;
-    case MIDI_EVENT_POLY_KEY_PRESSURE: numDataBytes = 2; break;
-    case MIDI_EVENT_CONTROL_CHANGE:    numDataBytes = 2; break;
-    case MIDI_EVENT_PROGRAM_CHANGE:    numDataBytes = 1; break;
-    case MIDI_EVENT_CHANNEL_PRESSURE:  numDataBytes = 1; break;
-    case MIDI_EVENT_PITCH_BEND:        numDataBytes = 2; break;    
+    case MIDI_EVENT_NOTE_OFF:
+      prvReadByte(pMidiFile->p, &pEvent->params.noteOff.note, NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.noteOff.velocity, NULL);
+      return EMIDI_OK; // TODO: DRY
+
+    case MIDI_EVENT_NOTE_ON:
+      prvReadByte(pMidiFile->p, &pEvent->params.noteOn.note, NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.noteOn.velocity, NULL);
+      return EMIDI_OK; // TODO: DRY
+
+    case MIDI_EVENT_POLY_KEY_PRESSURE: skipBytes = 2; break;
+    case MIDI_EVENT_CONTROL_CHANGE:    skipBytes = 2; break;
+    case MIDI_EVENT_PROGRAM_CHANGE:    skipBytes = 1; break;
+    case MIDI_EVENT_CHANNEL_PRESSURE:  skipBytes = 1; break;
+    case MIDI_EVENT_PITCH_BEND:        skipBytes = 2; break;
   }
 
-  if(numDataBytes) {
-    prvSkipBytes(pMidiFile->p, numDataBytes);
+  if(skipBytes) {
+    prvSkipBytes(pMidiFile->p, skipBytes);
 
     return EMIDI_OK;
   }
@@ -181,7 +189,7 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
   switch(pEvent->eventId) {
     case MIDI_EVENT_SYSTEM_EXCLUSIVE: {
       // Ignore all bytes until EOX byte (0xF7):
- 
+
       uint8_t dataByte;
 
       do {
@@ -212,7 +220,7 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
     default:
       return EMIDI_FEATURE_NOT_IMPLEMENTED;
   }
-   
+
   return EMIDI_OK;
 }
 

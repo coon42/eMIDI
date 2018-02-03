@@ -20,8 +20,8 @@ static const char* midiEventToStr(uint8_t eventCode) {
   uint8_t systemMessage  = eventCode;
 
   switch(channelMessage) {
-    case MIDI_EVENT_NOTE_ON:                 return "Note-Off";
-    case MIDI_EVENT_NOTE_OFF:                return "Note-On";
+    case MIDI_EVENT_NOTE_OFF:                return "Note-Off";
+    case MIDI_EVENT_NOTE_ON:                 return "Note-On";
     case MIDI_EVENT_POLY_KEY_PRESSURE:       return "Poly Key Pressure";
     case MIDI_EVENT_CONTROL_CHANGE:          return "Control Change";
     case MIDI_EVENT_PROGRAM_CHANGE:          return "Program Change";
@@ -87,6 +87,45 @@ static void printMidiFileInfo(MidiFile* pMidiFile) {
   printf("\n");
 }
 
+static void printMidiEvent(const MidiEvent* e) {
+  printf("[0x%02X] %s", e->eventId, midiEventToStr(e->eventId));
+  uint8_t channelMessage = e->eventId & 0xF0;
+  uint8_t systemMessage  = e->eventId;
+
+  switch(channelMessage) {
+    case MIDI_EVENT_NOTE_OFF:
+      break;
+
+    case MIDI_EVENT_NOTE_ON:
+      printf(", Note: %d, Velocity: %d", e->params.noteOn.note, e->params.noteOn.velocity); // TODO: implement number to note function
+
+      if(e->params.noteOn.velocity == 0)
+        printf(" (Note-Off)");
+
+      break;
+
+    case MIDI_EVENT_POLY_KEY_PRESSURE:
+      break;
+
+    case MIDI_EVENT_CONTROL_CHANGE:
+      break;
+
+    case MIDI_EVENT_PROGRAM_CHANGE:
+      break;
+
+    case MIDI_EVENT_CHANNEL_PRESSURE:
+      break;
+
+    case MIDI_EVENT_PITCH_BEND:
+      break;
+  }
+
+  if(e->eventId == MIDI_EVENT_META)
+    printf(" - [0x%02x] %s", e->metaEventId, metaEventToStr(e->metaEventId));
+
+  printf("\n");
+}
+
 static void printMidiFileEvents(MidiFile* pMidiFile) {
   printf("Now reading MIDI events:\n");
   printf("========================\n\n");
@@ -99,14 +138,8 @@ static void printMidiFileEvents(MidiFile* pMidiFile) {
       return;
     }
 
-    printf("Next event is: [0x%02X] %s", e.eventId,
-        midiEventToStr(e.eventId));
+    printMidiEvent(&e);
 
-    if(e.eventId == MIDI_EVENT_META)
-      printf(" - [0x%02x] %s", e.metaEventId, metaEventToStr(e.metaEventId));
-  
-    printf("\n");
- 
   } while (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
 }
 
@@ -118,7 +151,7 @@ int main(int argc, char* pArgv[]) {
   }
 
   const char* pMidiFileName = pArgv[1];
-  MidiFile midi;  
+  MidiFile midi;
   Error error;
 
   error = eMidi_open(&midi, pMidiFileName);

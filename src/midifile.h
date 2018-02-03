@@ -29,16 +29,29 @@ typedef struct MidiFile {
   uint8_t prevEventId;
 } MidiFile;
 
+typedef union MidiStatusParams {
+  struct {
+    uint8_t note;
+    uint8_t velocity;
+  } noteOn;
+
+  struct {
+    uint8_t note;
+    uint8_t velocity;
+  } noteOff;
+} MidiStatusParams;
+
 typedef struct MidiEvent {
   uint32_t deltaTime;
   uint8_t eventId;
   uint8_t metaEventId;
   uint8_t metaEventLen;
+  MidiStatusParams params;
 } MidiEvent;
 
 enum MidiVoiceMessages {
-  MIDI_EVENT_NOTE_ON           = 0x80,
-  MIDI_EVENT_NOTE_OFF          = 0x90,
+  MIDI_EVENT_NOTE_OFF          = 0x80,
+  MIDI_EVENT_NOTE_ON           = 0x90,
   MIDI_EVENT_POLY_KEY_PRESSURE = 0xA0,
   MIDI_EVENT_CONTROL_CHANGE    = 0xB0,
   MIDI_EVENT_PROGRAM_CHANGE    = 0xC0,
