@@ -9,10 +9,10 @@ typedef struct MidiChunkInfo {
   uint32_t length;
 } MidiChunkInfo;
 
-typedef struct MidiHeader { 
+typedef struct MidiHeader {
   uint16_t format;
   uint16_t ntrks;
-  uint16_t division;  
+  uint16_t division;
 } MidiHeader;
 
 typedef struct MidiTrack {
@@ -55,7 +55,7 @@ enum MidiVoiceMessages {
   MIDI_EVENT_POLY_KEY_PRESSURE = 0xA0,
   MIDI_EVENT_CONTROL_CHANGE    = 0xB0,
   MIDI_EVENT_PROGRAM_CHANGE    = 0xC0,
-  MIDI_EVENT_CHANNEL_PRESSURE  = 0xD0,  
+  MIDI_EVENT_CHANNEL_PRESSURE  = 0xD0,
   MIDI_EVENT_PITCH_BEND        = 0xE0
 };
 
@@ -112,9 +112,9 @@ enum {
   EMIDI_INVALID_MIDI_FILE      = 3,
   EMIDI_UNEXPECTED_END_OF_FILE = 4,
   EMIDI_END_OF_FILE            = 5,
- 
+
 // remove as soon as supported:
-  EMIDI_FEATURE_NOT_IMPLEMENTED = 1000, 
+  EMIDI_FEATURE_NOT_IMPLEMENTED = 1000,
   EMIDI_FORMAT_1_NOT_SUPPORTED  = 1001,
   EMIDI_FORMAT_2_NOT_SUPPORTED  = 1002
 };
