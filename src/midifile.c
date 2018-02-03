@@ -221,7 +221,7 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
 
     // TODO: check for additional events which can occur in MIDI files:
     default:
-      return EMIDI_FEATURE_NOT_IMPLEMENTED;
+      return EMIDI_SYNTAX_ERROR;
   }
 
   return EMIDI_OK;

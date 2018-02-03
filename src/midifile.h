@@ -116,7 +116,7 @@ enum {
   EMIDI_END_OF_FILE            = 5,
 
 // remove as soon as supported:
-  EMIDI_FEATURE_NOT_IMPLEMENTED = 1000,
+  EMIDI_SYNTAX_ERROR            = 1000,
   EMIDI_FORMAT_1_NOT_SUPPORTED  = 1001,
   EMIDI_FORMAT_2_NOT_SUPPORTED  = 1002
 };
