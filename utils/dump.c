@@ -94,6 +94,7 @@ static void printMidiEvent(const MidiEvent* e) {
 
   switch(channelMessage) {
     case MIDI_EVENT_NOTE_OFF:
+      printf(", Note: %d, Velocity: %d", e->params.noteOff.note, e->params.noteOff.velocity); // TODO: implement number to note function
       break;
 
     case MIDI_EVENT_NOTE_ON:
