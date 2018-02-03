@@ -2,6 +2,7 @@
 #define _MIDIFILE_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 typedef struct MidiChunkInfo {
@@ -47,6 +48,7 @@ typedef struct MidiEvent {
   uint8_t metaEventId;
   uint8_t metaEventLen;
   MidiStatusParams params;
+  bool isRunningStatus;
 } MidiEvent;
 
 enum MidiVoiceMessages {

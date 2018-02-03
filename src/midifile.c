@@ -147,9 +147,12 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
   if(error = prvReadByte(pMidiFile->p, &pEvent->eventId, NULL))
     return error;
 
-  if(pEvent->eventId & 0x80)
+  if(pEvent->eventId & 0x80) {
+    pEvent->isRunningStatus = false;
     pMidiFile->prevEventId = pEvent->eventId;
+  }
   else {
+    pEvent->isRunningStatus = true;
     pEvent->eventId = pMidiFile->prevEventId;
 
     // TODO: do not read first data byte again. Skip second read instead:

@@ -88,7 +88,7 @@ static void printMidiFileInfo(MidiFile* pMidiFile) {
 }
 
 static void printMidiEvent(const MidiEvent* e) {
-  printf("[0x%02X] %s", e->eventId, midiEventToStr(e->eventId));
+  printf("[0x%02X%s] %s", e->eventId, e->isRunningStatus ? " R" : "", midiEventToStr(e->eventId));
   uint8_t channelMessage = e->eventId & 0xF0;
   uint8_t systemMessage  = e->eventId;
 
