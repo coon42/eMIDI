@@ -15,6 +15,6 @@ dump: dir midifile
 	gcc -Isrc utils/dump.c obj/midifile.o -o bin/dump
 
 test: dir midifile
-	g++ tests/tests.cpp obj/midifile.o -o bin/tests
+	g++ tests/tests.cpp -std=c++17 obj/midifile.o -o bin/tests
 	cd tests; ../bin/tests
 
