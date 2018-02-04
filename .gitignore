@@ -2,4 +2,5 @@
 *.gch
 *.out
 *.o
+bin
 
