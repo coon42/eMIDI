@@ -1,4 +1,4 @@
-# eMIDI
+# eMIDI [![Build Status](https://travis-ci.org/coon42/eMIDI.svg?branch=master)](https://travis-ci.org/coon42/eMIDI)
 MIDI library optimized for beeing used on embedded devices
 
 **This library is in a very early development state and not recommended for use yet!**
