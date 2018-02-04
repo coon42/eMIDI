@@ -21,7 +21,7 @@ MIDI library optimized for beeing used on embedded devices
 ### Implemented features so far ###
 
   * Opening and closing of MIDI files and validation of header.
-  * Reading of all midi events of any midi0 file (data bytes are ignored / running status does not work yet)
+  * Reading of all midi events of any midi0 file (data bytes of some events are ignored)
   * Support of running status events
   * Supported MIDI events
     * NoteOn
