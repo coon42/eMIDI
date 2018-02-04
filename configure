@@ -1,0 +1,4 @@
+#! /bin/sh
+
+# This is a dummy file to be compatible with travis cpp default build script
+
