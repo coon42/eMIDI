@@ -108,17 +108,18 @@ enum MetaEvents {
 typedef uint32_t Error;
 
 enum {
-  EMIDI_OK                     = 0,
-  EMIDI_INVALID_HANDLE         = 1,
-  EMIDI_CANNOT_OPEN_FILE       = 2,
-  EMIDI_INVALID_MIDI_FILE      = 3,
-  EMIDI_UNEXPECTED_END_OF_FILE = 4,
-  EMIDI_END_OF_FILE            = 5,
+  EMIDI_OK                     = 0x0000,
+  EMIDI_OK_END_OF_FILE         = 0x0001,
+
+  EMIDI_INVALID_HANDLE         = 0x1000,
+  EMIDI_CANNOT_OPEN_FILE       = 0x1001,
+  EMIDI_INVALID_MIDI_FILE      = 0x1002,
+  EMIDI_SYNTAX_ERROR           = 0x1003,
+  EMIDI_UNEXPECTED_END_OF_FILE = 0x1004,
 
 // remove as soon as supported:
-  EMIDI_SYNTAX_ERROR            = 1000,
-  EMIDI_FORMAT_1_NOT_SUPPORTED  = 1001,
-  EMIDI_FORMAT_2_NOT_SUPPORTED  = 1002
+  EMIDI_FORMAT_1_NOT_SUPPORTED  = 0x2000,
+  EMIDI_FORMAT_2_NOT_SUPPORTED  = 0x2001
 };
 
 Error eMidi_open(MidiFile* pMidiFile, const char* pFileName);

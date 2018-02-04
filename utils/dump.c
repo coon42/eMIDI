@@ -3,6 +3,7 @@
 static const char* errorToStr(Error error) {
   switch(error) {
     case EMIDI_OK:                      return "Ok";
+    case EMIDI_OK_END_OF_FILE:          return "Ok, end of file";
     case EMIDI_INVALID_HANDLE:          return "Invalid Handle";
     case EMIDI_CANNOT_OPEN_FILE:        return "Cannot open file";
     case EMIDI_INVALID_MIDI_FILE:       return "Invalid MIDI file";
