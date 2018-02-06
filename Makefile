@@ -23,13 +23,16 @@ bin:
 	mkdir bin
 
 obj/midifile.o: obj src/midifile.c
-	$(CC) -c src/midifile.c -o obj/midifile.o
+	$(CC) -Isrc -c src/midifile.c -o obj/midifile.o
 
-bin/dump: bin obj/midifile.o utils/dump.c
-	$(CC) -Isrc utils/dump.c obj/midifile.o -o bin/dump
+obj/helpers.o: obj utils/helpers.c
+	$(CC) -Isrc -c utils/helpers.c -o obj/helpers.o
+
+bin/dump: bin obj/midifile.o obj/helpers.o utils/dump.c
+	$(CC) -Isrc utils/dump.c obj/midifile.o obj/helpers.o -o bin/dump
 
 bin/player: bin obj/midifile.o utils/player.c
-	$(CC) -Isrc utils/player.c obj/midifile.o -o bin/player
+	$(CC) -Isrc utils/player.c obj/midifile.o obj/helpers.o -o bin/player
 
 bin/tests: bin obj/midifile.o
 	$(CXX) tests/tests.cpp $(CXXFLAGS) obj/midifile.o -o bin/tests
