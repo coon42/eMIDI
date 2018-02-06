@@ -25,8 +25,8 @@ bin:
 obj/midifile.o: obj src/midifile.c
 	$(CC) -Isrc -c src/midifile.c -o obj/midifile.o
 
-obj/helpers.o: obj utils/helpers.c
-	$(CC) -Isrc -c utils/helpers.c -o obj/helpers.o
+obj/helpers.o: obj src/helpers.c
+	$(CC) -Isrc -c src/helpers.c -o obj/helpers.o
 
 bin/dump: bin obj/midifile.o obj/helpers.o utils/dump.c
 	$(CC) -Isrc utils/dump.c obj/midifile.o obj/helpers.o -o bin/dump
