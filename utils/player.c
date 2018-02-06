@@ -14,7 +14,7 @@ int main(int argc, char* pArgv[]) {
 
   if(error = eMidi_open(&midi, pMidiFileName)) {
     printf("Cannot open file: '%s'\n", pMidiFileName);
-    // printError(error);
+    eMidi_printError(error);
 
     return 2;
   }
@@ -29,7 +29,11 @@ int main(int argc, char* pArgv[]) {
       return 3;
     }
 
-//    printMidiEvent(&e);
+    // TODO:
+    // - calculate delta time to microseconds
+    // - wait until time is passed
+
+    eMidi_printMidiEvent(&e);
 
   } while (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
 
