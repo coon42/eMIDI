@@ -34,6 +34,6 @@ bin/dump: bin obj/midifile.o obj/helpers.o utils/dump.c
 bin/player: bin obj/midifile.o utils/player.c
 	$(CC) -Isrc utils/player.c obj/midifile.o obj/helpers.o -o bin/player
 
-bin/tests: bin obj/midifile.o
+bin/tests: bin obj/midifile.o tests/tests.cpp
 	$(CXX) tests/tests.cpp $(CXXFLAGS) obj/midifile.o -o bin/tests
 
