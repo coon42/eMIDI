@@ -29,6 +29,12 @@ TEST_CASE("eMidi_open tests", "[open]") {
     REQUIRE(eMidi_open(&midi, "midis/c4_0.mid") == EMIDI_OK);
   }
 
+  SECTION("Complete parsing of cdefgabc_0.mid without any error") {
+    MidiFile midi;
+
+    REQUIRE(eMidi_open(&midi, "midis/cdefgabc_0.mid") == EMIDI_OK);
+  }
+
   SECTION("Complete parsing of turkish_match0.mid without any error") {
     MidiFile midi;
     REQUIRE(eMidi_open(&midi, "midis/turkish_march0.mid") == EMIDI_OK);
