@@ -1,5 +1,6 @@
 CC  = gcc
 CXX = g++
+CFLAGS   = -std=c99
 CXXFLAGS = -std=c++17
 
 .PHONY: all clean test dump player
@@ -23,17 +24,17 @@ bin:
 	mkdir bin
 
 obj/midifile.o: obj src/midifile.c
-	$(CC) -Isrc -c src/midifile.c -o obj/midifile.o
+	$(CC) $(CFLAGS) -Isrc -c src/midifile.c -o obj/midifile.o
 
 obj/helpers.o: obj src/helpers.c
-	$(CC) -Isrc -c src/helpers.c -o obj/helpers.o
+	$(CC) $(CFLAGS) -Isrc -c src/helpers.c -o obj/helpers.o
 
 bin/dump: bin obj/midifile.o obj/helpers.o utils/dump.c
-	$(CC) -Isrc obj/midifile.o obj/helpers.o utils/dump.c -o bin/dump
+	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o utils/dump.c -o bin/dump
 
 bin/player: bin obj/midifile.o obj/helpers.o utils/player.c
-	$(CC) -Isrc obj/midifile.o obj/helpers.o utils/player.c -o bin/player
+	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o utils/player.c -o bin/player
 
 bin/tests: bin obj/midifile.o tests/tests.cpp
-	$(CXX) obj/midifile.o tests/tests.cpp $(CXXFLAGS) -o bin/tests
+	$(CXX) $(CXXFLAGS) obj/midifile.o tests/tests.cpp -o bin/tests
 
