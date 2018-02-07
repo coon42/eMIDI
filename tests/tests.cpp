@@ -91,7 +91,7 @@ TEST_CASE("eMidi_open tests", "[open]") {
 */
 
 // TODO: create invalid MIDI files with following behaviour:
-// - ntrks is != 1 on when format is 0 
+// - ntrks is != 1 on when format is 0
 // - format is greater than 2
 // - unexpected end of file
 // - No MTrk header after MThd header
@@ -101,6 +101,7 @@ TEST_CASE("eMidi_open tests", "[open]") {
 // - Start a sysex message F0 but never terminate it with F7
 // - running status event tests:
 // -   only allow running status for voice and mode messages only
+// - Files with SMPTE divison must result in a EMIDI_DIVISION_FORMAT_NOT_SUPPORTED error on opening
 
 }
 

@@ -129,9 +129,20 @@ Error eMidi_printFileInfo(MidiFile* pMidiFile) {
   printf("\n");
   printf("MIDI header:\n");
   printf("------------\n");
-  printf("Format: %d\n", pMidiFile->header.format);
-  printf("Number of Tracks: %d\n", pMidiFile->header.ntrks);
-  printf("Division: %d\n", pMidiFile->header.division);
+  printf("File format: %d\n", pMidiFile->header.format);
+  printf("Number of tracks: %d\n", pMidiFile->header.ntrks);
+  printf("Division format: %s\n", pMidiFile->header.format == 0 ? "TPQN" : "SMPTE");
+
+  switch(pMidiFile->header.division.format) {
+    case DIVISION_TPQN:
+      printf("Ticks per quarter note: %d\n", pMidiFile->header.division.tqpn.TQPN);
+      break;
+
+    case DIVISION_SMPTE:
+      printf("SMPTE format is not supported!\n");
+      break;
+  }
+
   printf("\n");
 
   return EMIDI_OK;

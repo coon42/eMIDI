@@ -96,9 +96,9 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   MidiHeader header;
   error = prvReadVoid(p, &header, chunkInfo.length, &numBytesRead);
 
-  header.format   = __bswap_16(header.format);
-  header.ntrks    = __bswap_16(header.ntrks);
-  header.division = __bswap_16(header.division);
+  header.format       = __bswap_16(header.format);
+  header.ntrks        = __bswap_16(header.ntrks);
+  header.division.raw = __bswap_16(header.division.raw);
 
   if(header.format > 2)
     return EMIDI_INVALID_MIDI_FILE;
@@ -108,6 +108,9 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
 
   if(header.format == 2)
     return EMIDI_FORMAT_2_NOT_SUPPORTED;
+
+  if(header.division.format != DIVISION_TPQN)
+    return EMIDI_DIVISION_FORMAT_NOT_SUPPORTED;
 
   if(header.format == 0 && header.ntrks != 1)
     return EMIDI_INVALID_MIDI_FILE;

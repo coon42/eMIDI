@@ -10,10 +10,34 @@ typedef struct MidiChunkInfo {
   uint32_t length;
 } MidiChunkInfo;
 
+enum DivisionFormat {
+  DIVISION_TPQN,
+  DIVISION_SMPTE
+};
+
 typedef struct MidiHeader {
   uint16_t format;
   uint16_t ntrks;
-  uint16_t division;
+
+  union {
+    uint16_t raw;
+
+    uint16_t
+           : 15,
+    format : 1;
+
+    struct {
+      uint16_t
+      ticksPerFrame  : 8,
+      negSmpteFormat : 7;
+    } smpte;
+
+    struct {
+      uint16_t
+      TQPN : 15;
+    } tqpn;
+  } division;
+
 } MidiHeader;
 
 typedef struct MidiTrack {
@@ -118,8 +142,9 @@ enum {
   EMIDI_UNEXPECTED_END_OF_FILE = 0x1004,
 
 // remove as soon as supported:
-  EMIDI_FORMAT_1_NOT_SUPPORTED  = 0x2000,
-  EMIDI_FORMAT_2_NOT_SUPPORTED  = 0x2001
+  EMIDI_FORMAT_1_NOT_SUPPORTED        = 0x2000,
+  EMIDI_FORMAT_2_NOT_SUPPORTED        = 0x2001,
+  EMIDI_DIVISION_FORMAT_NOT_SUPPORTED = 0x2002
 };
 
 Error eMidi_open(MidiFile* pMidiFile, const char* pFileName);
