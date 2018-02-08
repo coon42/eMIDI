@@ -75,7 +75,8 @@ const char* eMidi_metaEventToStr(int metaEventId) {
 }
 
 Error eMidi_printMidiEvent(const MidiEvent* e) {
-  printf("[0x%02X%s] %s", e->eventId, e->isRunningStatus ? " R" : "", eMidi_eventToStr(e->eventId));
+  printf("[%04d] [0x%02X%s] %s", e->deltaTime, e->eventId, e->isRunningStatus ? " R" : "",
+      eMidi_eventToStr(e->eventId));
   uint8_t channelMessage = e->eventId & 0xF0;
   uint8_t systemMessage  = e->eventId;
 
