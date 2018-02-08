@@ -43,7 +43,9 @@ static Error prvReadVarLen(FILE* p, uint32_t* pLen) {
   if(error = prvReadByte(p, &c, NULL))
     return error;
 
-  if(value = c & 0x80) {
+  value = c;
+
+  if(c & 0x80) {
     value &= 0x7f;
 
     do {
