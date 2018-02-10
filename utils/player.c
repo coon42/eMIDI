@@ -1,3 +1,6 @@
+#define _POSIX_C_SOURCE	199309L // make nanosleep available
+#include <time.h>
+
 #include "midifile.h"
 #include "helpers.h"
 
@@ -29,9 +32,19 @@ int main(int argc, char* pArgv[]) {
       return 3;
     }
 
-    // TODO:
-    // - calculate delta time to microseconds
-    // - wait until time is passed
+    static const uint32_t c = 60000000;
+    uint32_t bpm = 120; // TODO: retrieve from tempo meta event
+    uint32_t uspsqn = c / bpm;
+    uint32_t TQPN = midi.header.division.tqpn.TQPN;
+    uint32_t usToWait = (e.deltaTime * uspsqn) / TQPN;
+
+    struct timespec ts;
+    ts.tv_sec = 0;
+    ts.tv_nsec = usToWait * 1000;
+
+    nanosleep(&ts, NULL);
+
+    // TODO: play notes on MIDI device
 
     eMidi_printMidiEvent(&e);
 
