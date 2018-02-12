@@ -104,17 +104,23 @@ int main(int argc, char* pArgv[]) {
 
   MidiEvent e;
 
+  static const uint32_t c = 60000000;
+  uint32_t bpm = 120;
+  uint32_t uspqn = c / bpm; // TODO: retrieve from tempo meta event
+
   do {
     if(error = eMidi_readEvent(&midi, &e)) {
       printf("Error on reading event: [0x%02X] (Error %d: %s)\n",e.eventId, error, eMidi_errorToStr(error));
       return 3;
     }
 
-    static const uint32_t c = 60000000;
-    uint32_t bpm = 120; // TODO: retrieve from tempo meta event
-    uint32_t uspsqn = c / bpm;
+    if(e.eventId == MIDI_EVENT_META) {
+      if(e.metaEventId == MIDI_SET_TEMPO)
+        uspqn = e.params.meta.setTempo.usPerQuarterNote;
+    }
+
     uint32_t TQPN = midi.header.division.tqpn.TQPN;
-    uint32_t usToWait = (e.deltaTime * uspsqn) / TQPN;
+    uint32_t usToWait = (e.deltaTime * uspqn) / TQPN;
 
     struct timespec ts;
     ts.tv_sec = 0;
