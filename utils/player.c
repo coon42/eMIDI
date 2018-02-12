@@ -1,4 +1,4 @@
-#define _POSIX_C_SOURCE	199309L // make nanosleep available
+#define _DEFAULT_SOURCE
 #include <time.h>
 
 #include <sys/ioctl.h>
@@ -130,11 +130,8 @@ int main(int argc, char* pArgv[]) {
     uint32_t TQPN = midi.header.division.tqpn.TQPN;
     uint32_t usToWait = (e.deltaTime * uspqn) / TQPN;
 
-    struct timespec ts;
-    ts.tv_sec = 0;
-    ts.tv_nsec = usToWait * 1000;
+    usleep(usToWait);
 
-    nanosleep(&ts, NULL);
     eMidi_printMidiEvent(&e);
     sendMidiMsg(fd, devnum, e);
 
