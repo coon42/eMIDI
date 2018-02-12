@@ -44,18 +44,7 @@ static void listDevices() {
 static void sendMidiMsg(int fd, int devnum, MidiEvent e) {
   uint8_t packet[4] = {SEQ_MIDIPUTC, 0, devnum, 0};
 
-  switch(e.eventId & 0x80) {
-    case MIDI_EVENT_NOTE_ON:
-      packet[1] = e.eventId;
-      write(fd, packet, sizeof(packet));
-
-      packet[1] = e.params.noteOn.note;
-      write(fd, packet, sizeof(packet));
-
-      packet[1] = e.params.noteOn.velocity;
-      write(fd, packet, sizeof(packet));
-      break;
-
+  switch(e.eventId & 0xF0) {
     case MIDI_EVENT_NOTE_OFF:
       packet[1] = e.eventId;
       write(fd, packet, sizeof(packet));
@@ -67,13 +56,23 @@ static void sendMidiMsg(int fd, int devnum, MidiEvent e) {
       write(fd, packet, sizeof(packet));
       break;
 
+    case MIDI_EVENT_NOTE_ON:
+      packet[1] = e.eventId;
+      write(fd, packet, sizeof(packet));
+
+      packet[1] = e.params.noteOn.note;
+      write(fd, packet, sizeof(packet));
+
+      packet[1] = e.params.noteOn.velocity;
+      write(fd, packet, sizeof(packet));
+      break;
+
     case MIDI_EVENT_PROGRAM_CHANGE:
       packet[1] = e.eventId;
       write(fd, packet, sizeof(packet));
 
       packet[1] = e.params.programChange.programNumber;
       write(fd, packet, sizeof(packet));
-
       break;
 
     default:
