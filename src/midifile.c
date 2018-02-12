@@ -195,7 +195,6 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
       uint16_t pitchBendValue = lsb;
       pitchBendValue |= (msb << 7);
 
-//      pEvent->params.pitchBend.value = __bswap_16(pitchBendValue);
       pEvent->params.pitchBend.value = pitchBendValue;
       return EMIDI_OK;
     }
