@@ -64,6 +64,13 @@ typedef union MidiStatusParams {
     uint8_t note;
     uint8_t velocity;
   } noteOff;
+
+  struct {
+    struct {
+      uint32_t usPerQuarterNote;
+    } setTempo;
+  } meta;
+
 } MidiStatusParams;
 
 typedef struct MidiEvent {

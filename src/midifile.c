@@ -216,9 +216,23 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
       if(error = prvReadByte(pMidiFile->p, &pEvent->metaEventLen, NULL))
         return error;
 
-      // Ignore meta events for now:
-      if(error = prvSkipBytes(pMidiFile->p, pEvent->metaEventLen))
-        return error;
+      switch(pEvent->metaEventId) {
+        case MIDI_SET_TEMPO: {
+          uint32_t uspqn;
+
+          if(error = prvReadVoid(pMidiFile->p, &uspqn, pEvent->metaEventLen, NULL))
+            return error;
+
+          pEvent->params.meta.setTempo.usPerQuarterNote = __bswap_32(uspqn) >> 8;
+
+          break;
+        }
+
+        default:
+          // Ignore params of unimplemented meta events:
+          if(error = prvSkipBytes(pMidiFile->p, pEvent->metaEventLen))
+            return error;
+      }
 
       // CHECKME: can META events be used for running status?
       break;

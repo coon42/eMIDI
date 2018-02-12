@@ -74,6 +74,12 @@ const char* eMidi_metaEventToStr(int metaEventId) {
   }
 }
 
+static uint32_t prvUspqn2bpm(uint32_t uspqn) {
+  static const uint32_t c = 60000000;
+
+  return c / uspqn;
+}
+
 Error eMidi_printMidiEvent(const MidiEvent* e) {
   printf("[%04d] [0x%02X%s] %s", e->deltaTime, e->eventId, e->isRunningStatus ? " R" : "",
       eMidi_eventToStr(e->eventId));
@@ -111,8 +117,18 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
       break;
   }
 
-  if(e->eventId == MIDI_EVENT_META)
-    printf(" - [0x%02x] %s", e->metaEventId, eMidi_metaEventToStr(e->metaEventId));
+  if(e->eventId == MIDI_EVENT_META) {
+    printf(" - [0x%02x] %s ", e->metaEventId, eMidi_metaEventToStr(e->metaEventId));
+
+    switch(e->metaEventId) {
+      case MIDI_SET_TEMPO:
+        printf("(%d bpm)", prvUspqn2bpm(e->params.meta.setTempo.usPerQuarterNote));
+        break;
+
+      default:
+        break;
+    }
+  }
 
   printf("\n");
 
