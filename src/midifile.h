@@ -70,6 +70,10 @@ typedef union MidiStatusParams {
   } programChange;
 
   struct {
+    uint16_t value;
+  } pitchBend;
+
+  struct {
     struct {
       uint32_t usPerQuarterNote;
     } setTempo;

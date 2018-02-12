@@ -186,7 +186,19 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
       return EMIDI_OK; // TODO: DRY return code
 
     case MIDI_EVENT_CHANNEL_PRESSURE:  skipBytes = 1; break;
-    case MIDI_EVENT_PITCH_BEND:        skipBytes = 2; break;
+    case MIDI_EVENT_PITCH_BEND: {
+      uint8_t lsb;
+      uint8_t msb;
+      prvReadByte(pMidiFile->p, &lsb, NULL);
+      prvReadByte(pMidiFile->p, &msb, NULL);
+
+      uint16_t pitchBendValue = lsb;
+      pitchBendValue |= (msb << 7);
+
+//      pEvent->params.pitchBend.value = __bswap_16(pitchBendValue);
+      pEvent->params.pitchBend.value = pitchBendValue;
+      return EMIDI_OK;
+    }
   }
 
   if(skipBytes) {

@@ -108,12 +108,14 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
       break;
 
     case MIDI_EVENT_PROGRAM_CHANGE:
+      // TODO: print instrument
       break;
 
     case MIDI_EVENT_CHANNEL_PRESSURE:
       break;
 
     case MIDI_EVENT_PITCH_BEND:
+      printf(", Value: %d", e->params.pitchBend.value);
       break;
   }
 
