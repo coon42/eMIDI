@@ -172,16 +172,19 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
     case MIDI_EVENT_NOTE_OFF:
       prvReadByte(pMidiFile->p, &pEvent->params.noteOff.note, NULL);
       prvReadByte(pMidiFile->p, &pEvent->params.noteOff.velocity, NULL);
-      return EMIDI_OK; // TODO: DRY
+      return EMIDI_OK; // TODO: DRY return code
 
     case MIDI_EVENT_NOTE_ON:
       prvReadByte(pMidiFile->p, &pEvent->params.noteOn.note, NULL);
       prvReadByte(pMidiFile->p, &pEvent->params.noteOn.velocity, NULL);
-      return EMIDI_OK; // TODO: DRY
+      return EMIDI_OK; // TODO: DRY return code
 
     case MIDI_EVENT_POLY_KEY_PRESSURE: skipBytes = 2; break;
     case MIDI_EVENT_CONTROL_CHANGE:    skipBytes = 2; break;
-    case MIDI_EVENT_PROGRAM_CHANGE:    skipBytes = 1; break;
+    case MIDI_EVENT_PROGRAM_CHANGE:
+      prvReadByte(pMidiFile->p, &pEvent->params.programChange.programNumber, NULL);
+      return EMIDI_OK; // TODO: DRY return code
+
     case MIDI_EVENT_CHANNEL_PRESSURE:  skipBytes = 1; break;
     case MIDI_EVENT_PITCH_BEND:        skipBytes = 2; break;
   }

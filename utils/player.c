@@ -67,6 +67,15 @@ static void sendMidiMsg(int fd, int devnum, MidiEvent e) {
       write(fd, packet, sizeof(packet));
       break;
 
+    case MIDI_EVENT_PROGRAM_CHANGE:
+      packet[1] = e.eventId;
+      write(fd, packet, sizeof(packet));
+
+      packet[1] = e.params.programChange.programNumber;
+      write(fd, packet, sizeof(packet));
+
+      break;
+
     default:
       return;
   }

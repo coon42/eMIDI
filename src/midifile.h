@@ -66,6 +66,10 @@ typedef union MidiStatusParams {
   } noteOff;
 
   struct {
+    uint8_t programNumber;
+  } programChange;
+
+  struct {
     struct {
       uint32_t usPerQuarterNote;
     } setTempo;
