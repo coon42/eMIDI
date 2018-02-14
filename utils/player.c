@@ -1,9 +1,8 @@
 #define _DEFAULT_SOURCE
-#include <time.h>
+#include <unistd.h>
 
 #include <sys/ioctl.h>
 #include <linux/soundcard.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -114,7 +113,7 @@ int main(int argc, char* pArgv[]) {
 
   static const uint32_t c = 60000000;
   uint32_t bpm = 120;
-  uint32_t uspqn = c / bpm; // TODO: retrieve from tempo meta event
+  uint32_t uspqn = c / bpm;
 
   do {
     if(error = eMidi_readEvent(&midi, &e)) {
