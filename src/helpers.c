@@ -81,7 +81,7 @@ static uint32_t prvUspqn2bpm(uint32_t uspqn) {
 }
 
 Error eMidi_printMidiEvent(const MidiEvent* e) {
-  printf("[%04d] [0x%02X%s] %s", e->deltaTime, e->eventId, e->isRunningStatus ? " R" : "",
+  printf("[0x%02X%s] %s", e->eventId, e->isRunningStatus ? " R" : "",
       eMidi_eventToStr(e->eventId));
   uint8_t channelMessage = e->eventId & 0xF0;
   uint8_t systemMessage  = e->eventId;
