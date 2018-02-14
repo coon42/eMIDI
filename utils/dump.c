@@ -1,6 +1,15 @@
 #include "midifile.h"
 #include "helpers.h"
 
+static void usToTimeStr(uint32_t us, char* pBuf, int bufLen) {
+  uint32_t m  = (us / 60) / 1000000;
+  uint32_t s  = us        / 1000000 - m * 60;
+  // uint32_t ms = ((us - m * 60 * 1000000 - s * 1000000) / 100 + 5) / 10;
+  uint32_t ms = (us - m * 60 * 1000000 - s * 1000000) / 1000; // TODO: replace by above (round)
+
+  snprintf(pBuf, bufLen, "%02d:%02d:%03d", m, s, ms);
+}
+
 static void printTotalRuntime(MidiFile* pMidiFile) {
   static const uint32_t c = 60000000;
   uint32_t bpm = 120;
@@ -17,20 +26,19 @@ static void printTotalRuntime(MidiFile* pMidiFile) {
       return;
     }
 
+    usTotal += (e.deltaTime * uspqn) / pMidiFile->header.division.tqpn.TQPN;
+
     if(e.eventId == MIDI_EVENT_META) {
       if(e.metaEventId == MIDI_SET_TEMPO)
         uspqn = e.params.meta.setTempo.usPerQuarterNote;
     }
 
-    usTotal += (e.deltaTime * uspqn) / pMidiFile->header.division.tqpn.TQPN;
-
   } while (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
 
-  uint32_t m  = (usTotal / 60) / 1000000;
-  uint32_t s  = usTotal        / 1000000 - m * 60;
-  uint32_t ms = ((usTotal - m * 60 * 1000000 - s * 1000000) / 100 + 5) / 10;
+  char pBuf[64];
+  usToTimeStr(usTotal, pBuf, sizeof(pBuf));
 
-  printf("Duration: %02d:%02d:%03d\n", m, s, ms);
+  printf("Duration: %s\n", pBuf);
 }
 
 static void printMidiFileEvents(MidiFile* pMidiFile) {
@@ -39,6 +47,12 @@ static void printMidiFileEvents(MidiFile* pMidiFile) {
   MidiEvent e;
   Error error;
 
+  uint32_t totalTicks = 0;
+  static const uint32_t c = 60000000;
+  uint32_t bpm = 120;
+  uint32_t uspqn = c / bpm;
+  uint32_t usTotal = 0;
+
   do {
     if(error = eMidi_readEvent(pMidiFile, &e)) {
       printf("Error on reading event: [0x%02X] (Error %d: %s)\n",e.eventId, error,
@@ -46,7 +60,20 @@ static void printMidiFileEvents(MidiFile* pMidiFile) {
       return;
     }
 
+    if(e.eventId == MIDI_EVENT_META) {
+      if(e.metaEventId == MIDI_SET_TEMPO)
+        uspqn = e.params.meta.setTempo.usPerQuarterNote;
+    }
+
+    usTotal += (e.deltaTime * uspqn) / pMidiFile->header.division.tqpn.TQPN;
+
+    char pBuf[64];
+    usToTimeStr(usTotal, pBuf, sizeof(pBuf));
+
+    printf("[%04d (%s)] ", totalTicks, pBuf);
     eMidi_printMidiEvent(&e);
+
+    totalTicks += e.deltaTime;
 
   } while (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
 }
