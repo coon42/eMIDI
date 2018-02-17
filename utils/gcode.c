@@ -1,8 +1,18 @@
 #define _DEFAULT_SOURCE
 #include <unistd.h>
 
+#include <string.h>
 #include "midifile.h"
 #include "helpers.h"
+
+static void writeCmd(FILE* p, const char* pCmd) {
+  fwrite(pCmd, 1, strlen(pCmd), p);
+  fwrite("\r\n", 1, 2, p);
+}
+
+static void writeMidiNote(FILE* p, uint8_t axisId, uint8_t note, uint32_t durationUs) {
+  // TODO: implement
+}
 
 int main(int argc, char* pArgv[]) {
   if(argc < 2) {
@@ -24,6 +34,13 @@ int main(int argc, char* pArgv[]) {
 
   printf("Midi file '%s' opened successfully!\n", pMidiFileName);
 
+  FILE* p = fopen("gcode.nc", "w");
+
+  writeCmd(p, "G21"); // Unit selection: millimeters
+  writeCmd(p, "G90"); // Absolute distance mode
+  writeCmd(p, "G94"); // Feedrate is units per minute
+  writeCmd(p, "G00 X0 Y0 Z0"); // Go to home position
+
   MidiEvent e;
 
   static const uint32_t c = 60000000;
@@ -44,11 +61,16 @@ int main(int argc, char* pArgv[]) {
     uint32_t TQPN = midi.header.division.tqpn.TQPN;
     uint32_t usToWait = (e.deltaTime * uspqn) / TQPN;
 
-    // TODO: generate G1 gcode command:
-    usleep(usToWait);
+    // TODO: generate G1 gcode commands:
+    // usleep(usToWait);
     eMidi_printMidiEvent(&e);
 
   } while (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
+
+  writeCmd(p, "M02");
+  writeCmd(p, "");
+
+  fclose(p);
 
   eMidi_close(&midi);
 
