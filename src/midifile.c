@@ -1,10 +1,8 @@
 #include <string.h>
 #include "midifile.h"
-#include "byteswap.h"
+#include "mybyteswap.h"
 
-static Error prvSkipBytes(FILE* p, int len) {
-  int pos = ftell(p);
-
+static Error prvSkipBytes(FILE* p, int len) {  
   if(fseek(p, len, SEEK_CUR))
     return EMIDI_UNEXPECTED_END_OF_FILE;
 
@@ -90,7 +88,7 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(memcmp(chunkInfo.pChunk, "MThd", 4) != 0)
     return EMIDI_INVALID_MIDI_FILE;
 
-  chunkInfo.length = __bswap_32(chunkInfo.length);
+  chunkInfo.length = BSWAP_32(chunkInfo.length);
 
   if(chunkInfo.length != 6) // Might be change in a future MIDI standard
     return EMIDI_INVALID_MIDI_FILE;
@@ -98,9 +96,9 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   MidiHeader header;
   error = prvReadVoid(p, &header, chunkInfo.length, &numBytesRead);
 
-  header.format       = __bswap_16(header.format);
-  header.ntrks        = __bswap_16(header.ntrks);
-  header.division.raw = __bswap_16(header.division.raw);
+  header.format       = BSWAP_16(header.format);
+  header.ntrks        = BSWAP_16(header.ntrks);
+  header.division.raw = BSWAP_16(header.division.raw);
 
   if(header.format > 2)
     return EMIDI_INVALID_MIDI_FILE;
@@ -237,7 +235,7 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
           if(error = prvReadVoid(pMidiFile->p, &uspqn, pEvent->metaEventLen, NULL))
             return error;
 
-          pEvent->params.meta.setTempo.usPerQuarterNote = __bswap_32(uspqn) >> 8;
+          pEvent->params.meta.setTempo.usPerQuarterNote = BSWAP_32(uspqn) >> 8;
 
           break;
         }
