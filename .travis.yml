@@ -9,8 +9,6 @@ before_install:
 install:
   - sudo apt-get install -qq g++-6
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
-  - git submodule init
-  - git submodule update
 
 script:
   - make && make test
