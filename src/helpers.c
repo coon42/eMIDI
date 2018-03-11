@@ -89,14 +89,14 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
   switch(channelMessage) {
     case MIDI_EVENT_NOTE_OFF:
       // TODO: implement number to note function
-      printf(", Note: %d, Velocity: %d", e->params.noteOff.note, e->params.noteOff.velocity);
+      printf(", Note: %d, Velocity: %d", e->params.msg.noteOff.note, e->params.msg.noteOff.velocity);
       break;
 
     case MIDI_EVENT_NOTE_ON:
       // TODO: implement number to note function
-      printf(", Note: %d, Velocity: %d", e->params.noteOn.note, e->params.noteOn.velocity);
+      printf(", Note: %d, Velocity: %d", e->params.msg.noteOn.note, e->params.msg.noteOn.velocity);
 
-      if(e->params.noteOn.velocity == 0)
+      if(e->params.msg.noteOn.velocity == 0)
         printf(" (Note-Off)");
 
       break;
@@ -115,7 +115,7 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
       break;
 
     case MIDI_EVENT_PITCH_BEND:
-      printf(", Value: %d", e->params.pitchBend.value);
+      printf(", Value: %d", e->params.msg.pitchBend.value);
       break;
   }
 
@@ -124,7 +124,7 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
 
     switch(e->metaEventId) {
       case MIDI_SET_TEMPO:
-        printf("(%d bpm)", prvUspqn2bpm(e->params.meta.setTempo.usPerQuarterNote));
+        printf("(%d bpm)", prvUspqn2bpm(e->params.msg.meta.setTempo.usPerQuarterNote));
         break;
 
       default:

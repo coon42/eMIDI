@@ -54,30 +54,34 @@ typedef struct MidiFile {
   uint8_t prevEventId;
 } MidiFile;
 
-typedef union MidiStatusParams {
-  struct {
-    uint8_t note;
-    uint8_t velocity;
-  } noteOn;
-
-  struct {
-    uint8_t note;
-    uint8_t velocity;
-  } noteOff;
-
-  struct {
-    uint8_t programNumber;
-  } programChange;
-
-  struct {
-    uint16_t value;
-  } pitchBend;
-
-  struct {
+typedef struct MidiStatusParams {
+  uint8_t pRaw[2];
+  
+  union {
     struct {
-      uint32_t usPerQuarterNote;
-    } setTempo;
-  } meta;
+      uint8_t note;
+      uint8_t velocity;
+    } noteOff;
+
+    struct {
+      uint8_t note;
+      uint8_t velocity;
+    } noteOn;
+
+    struct {
+      uint8_t programNumber;
+    } programChange;
+
+    struct {
+      uint16_t value;
+    } pitchBend;
+
+    struct {
+      struct {
+        uint32_t usPerQuarterNote;
+      } setTempo;
+    } meta;
+  } msg;
 
 } MidiStatusParams;
 

@@ -136,7 +136,8 @@ Error eMidi_close(MidiFile* pMidiFile) {
   if(!pMidiFile)
     return EMIDI_INVALID_HANDLE;
 
-  fclose(pMidiFile->p);
+  if (pMidiFile->p)
+    fclose(pMidiFile->p);
 
   return EMIDI_OK;
 }
@@ -161,49 +162,58 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
     // TODO: do not read first data byte again. Skip second read instead:
     fseek(pMidiFile->p, -1, SEEK_CUR);
   }
-
-  int skipBytes = 0;
-
+     
   // First check for channel messages:
-
+    
   switch(pEvent->eventId & 0xF0) {
     case MIDI_EVENT_NOTE_OFF:
-      prvReadByte(pMidiFile->p, &pEvent->params.noteOff.note, NULL);
-      prvReadByte(pMidiFile->p, &pEvent->params.noteOff.velocity, NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);
+      pEvent->params.msg.noteOff.note     = pEvent->params.pRaw[0];
+      pEvent->params.msg.noteOff.velocity = pEvent->params.pRaw[1];
       return EMIDI_OK; // TODO: DRY return code
 
     case MIDI_EVENT_NOTE_ON:
-      prvReadByte(pMidiFile->p, &pEvent->params.noteOn.note, NULL);
-      prvReadByte(pMidiFile->p, &pEvent->params.noteOn.velocity, NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);
+      pEvent->params.msg.noteOn.note     = pEvent->params.pRaw[0];
+      pEvent->params.msg.noteOn.velocity = pEvent->params.pRaw[1];
       return EMIDI_OK; // TODO: DRY return code
 
-    case MIDI_EVENT_POLY_KEY_PRESSURE: skipBytes = 2; break;
-    case MIDI_EVENT_CONTROL_CHANGE:    skipBytes = 2; break;
+    case MIDI_EVENT_POLY_KEY_PRESSURE:       
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);
+      // TODO: implement
+      return EMIDI_OK; // TODO: DRY return code
+      
+    case MIDI_EVENT_CONTROL_CHANGE:
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);
+      // TODO: implement
+      return EMIDI_OK; // TODO: DRY return code
+      
     case MIDI_EVENT_PROGRAM_CHANGE:
-      prvReadByte(pMidiFile->p, &pEvent->params.programChange.programNumber, NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
+      pEvent->params.msg.programChange.programNumber = pEvent->params.pRaw[0];      
       return EMIDI_OK; // TODO: DRY return code
 
-    case MIDI_EVENT_CHANNEL_PRESSURE:  skipBytes = 1; break;
+    case MIDI_EVENT_CHANNEL_PRESSURE:  
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);      
+      // TODO: implement
+      return EMIDI_OK; // TODO: DRY return code
+
     case MIDI_EVENT_PITCH_BEND: {
-      uint8_t lsb;
-      uint8_t msb;
-      prvReadByte(pMidiFile->p, &lsb, NULL);
-      prvReadByte(pMidiFile->p, &msb, NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);          
+      
+      uint16_t pitchBendValue = pEvent->params.pRaw[0];
+      pitchBendValue |= (pEvent->params.pRaw[1] << 7);
 
-      uint16_t pitchBendValue = lsb;
-      pitchBendValue |= (msb << 7);
-
-      pEvent->params.pitchBend.value = pitchBendValue;
-      return EMIDI_OK;
+      pEvent->params.msg.pitchBend.value = pitchBendValue;
+      return EMIDI_OK; // TODO: DRY return code
     }
   }
-
-  if(skipBytes) {
-    prvSkipBytes(pMidiFile->p, skipBytes);
-
-    return EMIDI_OK;
-  }
-
+    
   // Now Check for System Messages:
 
   switch(pEvent->eventId) {
@@ -235,7 +245,7 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
           if(error = prvReadVoid(pMidiFile->p, &uspqn, pEvent->metaEventLen, NULL))
             return error;
 
-          pEvent->params.meta.setTempo.usPerQuarterNote = BSWAP_32(uspqn) >> 8;
+          pEvent->params.msg.meta.setTempo.usPerQuarterNote = BSWAP_32(uspqn) >> 8;
 
           break;
         }
