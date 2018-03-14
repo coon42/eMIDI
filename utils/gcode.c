@@ -55,7 +55,7 @@ int main(int argc, char* pArgv[]) {
 
     if(e.eventId == MIDI_EVENT_META) {
       if(e.metaEventId == MIDI_SET_TEMPO)
-        uspqn = e.params.meta.setTempo.usPerQuarterNote;
+        uspqn = e.params.msg.meta.setTempo.usPerQuarterNote;
     }
 
     uint32_t TQPN = midi.header.division.tqpn.TQPN;

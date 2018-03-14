@@ -48,10 +48,10 @@ static void sendMidiMsg(int fd, int devnum, MidiEvent e) {
       packet[1] = e.eventId;
       write(fd, packet, sizeof(packet));
 
-      packet[1] = e.params.noteOff.note;
+      packet[1] = e.params.msg.noteOff.note;
       write(fd, packet, sizeof(packet));
 
-      packet[1] = e.params.noteOff.velocity;
+      packet[1] = e.params.msg.noteOff.velocity;
       write(fd, packet, sizeof(packet));
       break;
 
@@ -59,10 +59,10 @@ static void sendMidiMsg(int fd, int devnum, MidiEvent e) {
       packet[1] = e.eventId;
       write(fd, packet, sizeof(packet));
 
-      packet[1] = e.params.noteOn.note;
+      packet[1] = e.params.msg.noteOn.note;
       write(fd, packet, sizeof(packet));
 
-      packet[1] = e.params.noteOn.velocity;
+      packet[1] = e.params.msg.noteOn.velocity;
       write(fd, packet, sizeof(packet));
       break;
 
@@ -70,7 +70,7 @@ static void sendMidiMsg(int fd, int devnum, MidiEvent e) {
       packet[1] = e.eventId;
       write(fd, packet, sizeof(packet));
 
-      packet[1] = e.params.programChange.programNumber;
+      packet[1] = e.params.msg.programChange.programNumber;
       write(fd, packet, sizeof(packet));
       break;
 
@@ -123,7 +123,7 @@ int main(int argc, char* pArgv[]) {
 
     if(e.eventId == MIDI_EVENT_META) {
       if(e.metaEventId == MIDI_SET_TEMPO)
-        uspqn = e.params.meta.setTempo.usPerQuarterNote;
+        uspqn = e.params.msg.meta.setTempo.usPerQuarterNote;
     }
 
     uint32_t TQPN = midi.header.division.tqpn.TQPN;

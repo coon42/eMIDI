@@ -30,7 +30,7 @@ static void printTotalRuntime(MidiFile* pMidiFile) {
 
     if(e.eventId == MIDI_EVENT_META) {
       if(e.metaEventId == MIDI_SET_TEMPO)
-        uspqn = e.params.meta.setTempo.usPerQuarterNote;
+        uspqn = e.params.msg.meta.setTempo.usPerQuarterNote;
     }
 
   } while (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
@@ -62,7 +62,7 @@ static void printMidiFileEvents(MidiFile* pMidiFile) {
 
     if(e.eventId == MIDI_EVENT_META) {
       if(e.metaEventId == MIDI_SET_TEMPO)
-        uspqn = e.params.meta.setTempo.usPerQuarterNote;
+        uspqn = e.params.msg.meta.setTempo.usPerQuarterNote;
     }
 
     usTotal += (e.deltaTime * uspqn) / pMidiFile->header.division.tqpn.TQPN;
