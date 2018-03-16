@@ -4,6 +4,7 @@
 const char* eMidi_errorToStr(Error error);
 const char* eMidi_eventToStr(uint8_t eventCode);
 const char* eMidi_metaEventToStr(int metaEventId);
+const char* eMidi_numberToNote(uint8_t midiNote);
 
 Error eMidi_printMidiEvent(const MidiEvent* e);
 Error eMidi_printError(Error error);

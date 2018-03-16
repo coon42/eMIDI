@@ -74,6 +74,141 @@ const char* eMidi_metaEventToStr(int metaEventId) {
   }
 }
 
+const char* eMidi_numberToNote(uint8_t midiNote) {
+  switch(midiNote) {
+    case 0:  return "C-1";
+    case 1:  return "C#-1";
+    case 2:  return "D-1";
+    case 3:  return "D#-1";
+    case 4:  return "E-1";
+    case 5:  return "F-1";
+    case 6:  return "F#-1";
+    case 7:  return "G-1";
+    case 8:  return "G#-1";
+    case 9:  return "A-1";
+    case 10: return "A#-1";
+    case 11: return "B-1";
+    case 12: return "C0";
+    case 13: return "C#0";
+    case 14: return "D0";
+    case 15: return "D#0";
+    case 16: return "E0";
+    case 17: return "F0";
+    case 18: return "F#0";
+    case 19: return "G0";
+    case 20: return "G#0";
+    case 21: return "A0";
+    case 22: return "A#0";
+    case 23: return "B0";
+    case 24: return "C1";
+    case 25: return "C#1";
+    case 26: return "D1";
+    case 27: return "D#1";
+    case 28: return "E1";
+    case 29: return "F1";
+    case 30: return "F#1";
+    case 31: return "G1";
+    case 32: return "G#1";
+    case 33: return "A1";
+    case 34: return "A#1";
+    case 35: return "B1";
+    case 36: return "C2";
+    case 37: return "C#2";
+    case 38: return "D2";
+    case 39: return "D#2";
+    case 40: return "E2";
+    case 41: return "F2";
+    case 42: return "F#2";
+    case 43: return "G2";
+    case 44: return "G#2";
+    case 45: return "A2";
+    case 46: return "A#2";
+    case 47: return "B2";
+    case 48: return "C3";
+    case 49: return "C#3";
+    case 50: return "D3";
+    case 51: return "D#3";
+    case 52: return "E3";
+    case 53: return "F3";
+    case 54: return "F#3";
+    case 55: return "G3";
+    case 56: return "G#3";
+    case 57: return "A3";
+    case 58: return "A#3";
+    case 59: return "B3";
+    case 60: return "C4";
+    case 61: return "C#4";
+    case 62: return "D4";
+    case 63: return "D#4";
+    case 64: return "E4";
+    case 65: return "F4";
+    case 66: return "F#4";
+    case 67: return "G4";
+    case 68: return "G#4";
+    case 69: return "A4";
+    case 70: return "A#4";
+    case 71: return "B4";
+    case 72: return "C5";
+    case 73: return "C#5";
+    case 74: return "D5";
+    case 75: return "D#5";
+    case 76: return "E5";
+    case 77: return "F5";
+    case 78: return "F#5";
+    case 79: return "G5";
+    case 80: return "G#5";
+    case 81: return "A5";
+    case 82: return "A#5";
+    case 83: return "B5";
+    case 84: return "C6";
+    case 85: return "C#6";
+    case 86: return "D6";
+    case 87: return "D#6";
+    case 88: return "E6";
+    case 89: return "F6";
+    case 90: return "F#6";
+    case 91: return "G6";
+    case 92: return "G#6";
+    case 93: return "A6";
+    case 94: return "A#6";
+    case 95: return "B6";
+    case 96: return "C7";
+    case 97: return "C#7";
+    case 98: return "D7";
+    case 99: return "D#7";
+    case 100: return "E7";
+    case 101: return "F7";
+    case 102: return "F#7";
+    case 103: return "G7";
+    case 104: return "G#7";
+    case 105: return "A7";
+    case 106: return "A#7";
+    case 107: return "B7";
+    case 108: return "C8";
+    case 109: return "C#8";
+    case 110: return "D8";
+    case 111: return "D#8";
+    case 112: return "E8";
+    case 113: return "F8";
+    case 114: return "F#8";
+    case 115: return "G8";
+    case 116: return "G#8";
+    case 117: return "A8";
+    case 118: return "A#8";
+    case 119: return "B8";
+    case 120: return "C9";
+    case 121: return "C#9";
+    case 122: return "D9";
+    case 123: return "D#9";
+    case 124: return "E9";
+    case 125: return "F9";
+    case 126: return "F#9";
+    case 127: return "G9";
+
+    default:  return "Invalid MIDI note";
+  }
+}
+
 static uint32_t prvUspqn2bpm(uint32_t uspqn) {
   static const uint32_t c = 60000000;
 
@@ -88,13 +223,13 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
 
   switch(channelMessage) {
     case MIDI_EVENT_NOTE_OFF:
-      // TODO: implement number to note function
-      printf(", Note: %d, Velocity: %d", e->params.msg.noteOff.note, e->params.msg.noteOff.velocity);
+      printf(", Note: %s (%d), Velocity: %d", eMidi_numberToNote(e->params.msg.noteOff.note),
+          e->params.msg.noteOff.note, e->params.msg.noteOff.velocity);
       break;
 
     case MIDI_EVENT_NOTE_ON:
-      // TODO: implement number to note function
-      printf(", Note: %d, Velocity: %d", e->params.msg.noteOn.note, e->params.msg.noteOn.velocity);
+      printf(", Note: %s (%d), Velocity: %d",  eMidi_numberToNote(e->params.msg.noteOn.note),
+          e->params.msg.noteOn.note, e->params.msg.noteOn.velocity);
 
       if(e->params.msg.noteOn.velocity == 0)
         printf(" (Note-Off)");
