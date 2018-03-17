@@ -56,7 +56,7 @@ typedef struct MidiFile {
 
 typedef struct MidiStatusParams {
   uint8_t pRaw[2];
-  
+
   union {
     struct {
       uint8_t note;
