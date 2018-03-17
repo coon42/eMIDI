@@ -2,7 +2,7 @@
 #include "midifile.h"
 #include "mybyteswap.h"
 
-static Error prvSkipBytes(FILE* p, int len) {  
+static Error prvSkipBytes(FILE* p, int len) {
   if(fseek(p, len, SEEK_CUR))
     return EMIDI_UNEXPECTED_END_OF_FILE;
 
@@ -90,7 +90,7 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
 
   chunkInfo.length = BSWAP_32(chunkInfo.length);
 
-  if(chunkInfo.length != 6) // Might be change in a future MIDI standard
+  if(chunkInfo.length != 6) // Might change in a future MIDI standard
     return EMIDI_INVALID_MIDI_FILE;
 
   MidiHeader header;
@@ -162,9 +162,9 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
     // TODO: do not read first data byte again. Skip second read instead:
     fseek(pMidiFile->p, -1, SEEK_CUR);
   }
-     
+
   // First check for channel messages:
-    
+
   switch(pEvent->eventId & 0xF0) {
     case MIDI_EVENT_NOTE_OFF:
       prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
@@ -180,32 +180,32 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
       pEvent->params.msg.noteOn.velocity = pEvent->params.pRaw[1];
       return EMIDI_OK; // TODO: DRY return code
 
-    case MIDI_EVENT_POLY_KEY_PRESSURE:       
+    case MIDI_EVENT_POLY_KEY_PRESSURE:
       prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
       prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);
       // TODO: implement
       return EMIDI_OK; // TODO: DRY return code
-      
+
     case MIDI_EVENT_CONTROL_CHANGE:
       prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
       prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);
       // TODO: implement
       return EMIDI_OK; // TODO: DRY return code
-      
+
     case MIDI_EVENT_PROGRAM_CHANGE:
       prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
-      pEvent->params.msg.programChange.programNumber = pEvent->params.pRaw[0];      
+      pEvent->params.msg.programChange.programNumber = pEvent->params.pRaw[0];
       return EMIDI_OK; // TODO: DRY return code
 
-    case MIDI_EVENT_CHANNEL_PRESSURE:  
-      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);      
+    case MIDI_EVENT_CHANNEL_PRESSURE:
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
       // TODO: implement
       return EMIDI_OK; // TODO: DRY return code
 
     case MIDI_EVENT_PITCH_BEND: {
       prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
-      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);          
-      
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);
+
       uint16_t pitchBendValue = pEvent->params.pRaw[0];
       pitchBendValue |= (pEvent->params.pRaw[1] << 7);
 
@@ -213,7 +213,7 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
       return EMIDI_OK; // TODO: DRY return code
     }
   }
-    
+
   // Now Check for System Messages:
 
   switch(pEvent->eventId) {
