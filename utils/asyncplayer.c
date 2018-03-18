@@ -79,7 +79,7 @@ static void sendMidiMsg(int fd, int devnum, MidiEvent e) {
   }
 }
 
-static Error play(MidiFile* pMidi, int32_t fd, uint8_t devnum) {
+static Error midiPlayerTick(MidiFile* pMidi, int32_t fd, uint8_t devnum) {
   static const uint32_t c = 60000000;
   uint32_t bpm = 120;
   uint32_t uspqn = c / bpm;
@@ -87,26 +87,29 @@ static Error play(MidiFile* pMidi, int32_t fd, uint8_t devnum) {
   Error error;
   MidiEvent e;
 
-  do {
-    if(error = eMidi_readEvent(pMidi, &e)) {
-      printf("Error on reading event: [0x%02X] (Error %d: %s)\n",e.eventId, error, eMidi_errorToStr(error));
-      return 3;
-    }
+  if(error = eMidi_readEvent(pMidi, &e)) {
+    printf("Error on reading event: [0x%02X] (Error %d: %s)\n",e.eventId, error, eMidi_errorToStr(error));
+    return 3;
+  }
 
-    if(e.eventId == MIDI_EVENT_META) {
-      if(e.metaEventId == MIDI_SET_TEMPO)
-        uspqn = e.params.msg.meta.setTempo.usPerQuarterNote;
-    }
+  if(e.eventId == MIDI_EVENT_META) {
+    if(e.metaEventId == MIDI_SET_TEMPO)
+      uspqn = e.params.msg.meta.setTempo.usPerQuarterNote;
+  }
 
-    uint32_t TQPN = pMidi->header.division.tqpn.TQPN;
-    uint32_t usToWait = (e.deltaTime * uspqn) / TQPN;
+  uint32_t TQPN = pMidi->header.division.tqpn.TQPN;
+  uint32_t usToWait = (e.deltaTime * uspqn) / TQPN;
 
-    usleep(usToWait);
+  usleep(usToWait);
 
-    eMidi_printMidiEvent(&e);
-    sendMidiMsg(fd, devnum, e);
+  eMidi_printMidiEvent(&e);
+  sendMidiMsg(fd, devnum, e);
 
-  } while (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
+  return (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
+}
+
+static Error play(MidiFile* pMidi, int32_t fd, uint8_t devnum) {
+  while(midiPlayerTick(pMidi, fd, devnum));
 }
 
 int main(int argc, char* pArgv[]) {
