@@ -209,6 +209,71 @@ const char* eMidi_numberToNote(uint8_t midiNote) {
   }
 }
 
+const char* eMidi_drumToStr(uint8_t midiNote) {
+  switch(midiNote) {
+    case 35: return "Acoustic Bass Drum";
+    case 36: return "Bass Drum 1";
+    case 37: return "Side Stick";
+    case 38: return "Acoustic Snare";
+    case 39: return "Hand Clap";
+    case 40: return "Electric Snare";
+    case 41: return "Low Floor Tom";
+    case 42: return "Closed Hi Hat";
+    case 43: return "High Floor Tom";
+    case 44: return "Pedal Hi-Hat";
+    case 45: return "Low Tom";
+    case 46: return "Open Hi-Hat";
+    case 47: return "Low-Mid Tom";
+    case 48: return "Hi Mid Tom";
+    case 49: return "Crash Cymbal 1";
+    case 50: return "High Tom";
+    case 51: return "Ride Cymbal 1";
+    case 52: return "Chinese Cymbal";
+    case 53: return "Ride Bell";
+    case 54: return "Tambourine";
+    case 55: return "Splash Cymbal";
+    case 56: return "Cowbell";
+    case 57: return "Crash Cymbal 2";
+    case 58: return "Vibraslap";
+    case 59: return "Ride Cymbal 2";
+    case 60: return "Hi Bongo";
+    case 61: return "Low Bongo";
+    case 62: return "Mute Hi Conga";
+    case 63: return "Open Hi Conga";
+    case 64: return "Low Conga";
+    case 65: return "High Timbale";
+    case 66: return "Low Timbale";
+    case 67: return "High Agogo";
+    case 68: return "Low Agogo";
+    case 69: return "Cabasa";
+    case 70: return "Maracas";
+    case 71: return "Short Whistle";
+    case 72: return "Long Whistle";
+    case 73: return "Short Guiro";
+    case 74: return "Long Guiro";
+    case 75: return "Claves";
+    case 76: return "Hi Wood Block";
+    case 77: return "Low Wood Block";
+    case 78: return "Mute Cuica";
+    case 79: return "Open Cuica";
+    case 80: return "Mute Triangle";
+    case 81: return "Open Triangle";
+
+    // Non standard:
+    case 82: return "Shaker";
+    case 83: return "Sleigh Bell";
+    case 84: return "Bell Tree";
+    case 85: return "Castanets";
+    case 86: return "Surdu Dead Stroke";
+    case 87: return "Surdu";
+    case 91: return "Snare Drum Rod";
+    case 92: return "Ocean Drum";
+    case 93: return "Snare Drum Brush";
+
+    default: return "Unknown percussion";
+  }
+}
+
 const char* eMidi_programToStr(uint8_t programNo) {
   switch(programNo + 1) {
     case   1: return "Acoustic Grand Piano";
@@ -350,21 +415,28 @@ static uint32_t prvUspqn2bpm(uint32_t uspqn) {
   return c / uspqn;
 }
 
+static void printMidiNote(uint8_t channel, uint8_t midiNote, uint8_t velocity) {
+  if(channel == 9)
+    printf(", Drum: %s (%d), Velocity: %d", eMidi_drumToStr(midiNote), midiNote, velocity);
+  else
+    printf(", Note: %s (%d), Velocity: %d", eMidi_numberToNote(midiNote), midiNote, velocity);
+}
+
 Error eMidi_printMidiEvent(const MidiEvent* e) {
   printf("[0x%02X%s] %s", e->eventId, e->isRunningStatus ? " R" : "",
       eMidi_eventToStr(e->eventId));
+
+  uint8_t channelNo      = e->eventId & 0x0F;
   uint8_t channelMessage = e->eventId & 0xF0;
   uint8_t systemMessage  = e->eventId;
 
   switch(channelMessage) {
     case MIDI_EVENT_NOTE_OFF:
-      printf(", Note: %s (%d), Velocity: %d", eMidi_numberToNote(e->params.msg.noteOff.note),
-          e->params.msg.noteOff.note, e->params.msg.noteOff.velocity);
+      printMidiNote(channelNo, e->params.msg.noteOff.note, e->params.msg.noteOff.velocity);
       break;
 
     case MIDI_EVENT_NOTE_ON:
-      printf(", Note: %s (%d), Velocity: %d",  eMidi_numberToNote(e->params.msg.noteOn.note),
-          e->params.msg.noteOn.note, e->params.msg.noteOn.velocity);
+      printMidiNote(channelNo, e->params.msg.noteOn.note, e->params.msg.noteOn.velocity);
 
       if(e->params.msg.noteOn.velocity == 0)
         printf(" (Note-Off)");
