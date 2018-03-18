@@ -3,9 +3,9 @@ CXX = g++
 CFLAGS   = -std=c99
 CXXFLAGS = -std=c++17
 
-.PHONY: all clean test dump player gcode
+.PHONY: all clean test dump player asyncplayer gcode
 
-all: dump player gcode
+all: dump player asyncplayer gcode
 
 clean:
 	rm -rf obj
@@ -16,6 +16,7 @@ test: bin/tests
 
 dump: bin/dump
 player: bin/player
+asyncplayer: bin/asyncplayer
 gcode: bin/gcode
 
 obj:
@@ -35,6 +36,9 @@ bin/dump: bin obj/midifile.o obj/helpers.o utils/dump.c
 
 bin/player: bin obj/midifile.o obj/helpers.o utils/player.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o utils/player.c -o bin/player
+
+bin/asyncplayer: bin obj/midifile.o obj/helpers.o utils/asyncplayer.c
+	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o utils/asyncplayer.c -o bin/asyncplayer
 
 bin/gcode: bin obj/midifile.o obj/helpers.o utils/gcode.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o utils/gcode.c -o bin/gcode
