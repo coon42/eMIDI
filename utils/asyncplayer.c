@@ -79,37 +79,53 @@ static void sendMidiMsg(int fd, int devnum, MidiEvent e) {
   }
 }
 
-static Error midiPlayerTick(MidiFile* pMidi, int32_t fd, uint8_t devnum) {
-  static const uint32_t c = 60000000;
-  uint32_t bpm = 120;
-  uint32_t uspqn = c / bpm;
+typedef struct MidiPlayer {
+  MidiFile midi;
+  uint32_t uspqn;
+  uint32_t nextEventTimeUs;
 
+  // TODO: move to callback context::
+  int32_t fd;
+  uint8_t devnum;
+} MidiPlayer;
+
+static void midiPlayerInit(MidiPlayer* pPlayer) {
+  static const uint32_t c = 60000000;
+  static const uint32_t defaultBpm = 120;
+
+  pPlayer->uspqn = c / defaultBpm;
+  pPlayer->nextEventTimeUs = 0;
+}
+
+static int midiPlayerTick(MidiPlayer* pPlayer) {
   Error error;
   MidiEvent e;
 
-  if(error = eMidi_readEvent(pMidi, &e)) {
-    printf("Error on reading event: [0x%02X] (Error %d: %s)\n",e.eventId, error, eMidi_errorToStr(error));
+  if(error = eMidi_readEvent(&pPlayer->midi, &e)) {
+    printf("Error on reading event: [0x%02X] (Error %d: %s)\n",e.eventId, error,
+        eMidi_errorToStr(error));
+
     return 3;
   }
 
   if(e.eventId == MIDI_EVENT_META) {
     if(e.metaEventId == MIDI_SET_TEMPO)
-      uspqn = e.params.msg.meta.setTempo.usPerQuarterNote;
+      pPlayer->uspqn = e.params.msg.meta.setTempo.usPerQuarterNote;
   }
 
-  uint32_t TQPN = pMidi->header.division.tqpn.TQPN;
-  uint32_t usToWait = (e.deltaTime * uspqn) / TQPN;
+  uint32_t TQPN = pPlayer->midi.header.division.tqpn.TQPN;
+  uint32_t usToWait = (e.deltaTime * pPlayer->uspqn) / TQPN;
 
   usleep(usToWait);
 
   eMidi_printMidiEvent(&e);
-  sendMidiMsg(fd, devnum, e);
+  sendMidiMsg(pPlayer->fd, pPlayer->devnum, e);
 
   return (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
 }
 
-static Error play(MidiFile* pMidi, int32_t fd, uint8_t devnum) {
-  while(midiPlayerTick(pMidi, fd, devnum));
+static Error play(MidiPlayer* pPlayer) {
+  while(midiPlayerTick(pPlayer));
 }
 
 int main(int argc, char* pArgv[]) {
@@ -130,10 +146,15 @@ int main(int argc, char* pArgv[]) {
   }
 
   const char* pMidiFileName = pArgv[1];
-  MidiFile midi;
   Error error;
 
-  if(error = eMidi_open(&midi, pMidiFileName)) {
+  MidiPlayer player;
+  midiPlayerInit(&player);
+
+  player.fd = fd;
+  player.devnum = devnum;
+
+  if(error = eMidi_open(&player.midi, pMidiFileName)) {
     printf("Cannot open file: '%s'\n", pMidiFileName);
     eMidi_printError(error);
 
@@ -142,10 +163,10 @@ int main(int argc, char* pArgv[]) {
 
   printf("Midi file '%s' opened successfully!\n", pMidiFileName);
 
-  if(error = play(&midi, fd, devnum))
+  if(error = play(&player))
     return error;
 
-  eMidi_close(&midi);
+  eMidi_close(&player.midi);
   close(fd);
 
   return 0;
