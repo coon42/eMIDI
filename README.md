@@ -2,13 +2,13 @@
 
 MIDI library optimized for beeing used on embedded devices
 
-**This library is in a very early development state and not recommended for use yet!**
+**This library is in a usable state but not recommended for productive use yet! Most events are not supported yet and the API meight break at any time**
 
 ### Overall Design Goals ###
   * The main target are microcontrollers with very limited ressources
 
   * Robust design / does not behave undefined on malformed or broken MIDI files
-  * Implementation is strictly done after MIDI 1.0 specification
+  * Implementation is done after MIDI 1.0 specification
   * Minimum code footprint (configurable by #define)
   * Minimum RAM footprint (configurable by #define)
   * MIDI file gets not loaded into memory but gets streamed
@@ -24,16 +24,18 @@ MIDI library optimized for beeing used on embedded devices
   * Opening and closing of MIDI files and validation of header.
   * Reading of all midi events of any midi0 file (data bytes of some events are ignored)
   * Support of running status events
-  * Supported MIDI events
-    * NoteOn
+  * Supported channel events
     * NoteOff
-    * End of Track meta event
+    * NoteOn 
+    * Control Change
+    * Program Change
+    * Pitch Bend
+  * Supported META events
+    * End of Track          
+    * Set Tempo       
     * All other events are ignored in first iteration and will be supported later
 
 ### Planned ###
-  * MIDI events
-    * Pitch Bend
-
   * Creation of MIDI files
   * MIDI 1 to MIDI 0 converter
   * "Compression" - Use running status events plus Note-On with zero velocity for Note-Off
