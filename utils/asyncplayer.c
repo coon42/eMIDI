@@ -1,6 +1,7 @@
 #define _DEFAULT_SOURCE
 #include <unistd.h>
 
+#include <time.h>
 #include <sys/ioctl.h>
 #include <linux/soundcard.h>
 #include <fcntl.h>
@@ -157,7 +158,16 @@ static Error play(MidiPlayer* pPlayer) {
   while(midiPlayerTick(pPlayer) == EMIDI_OK); // TODO: must not block!
 }
 
+static int timeUs() {
+  struct timespec t;
+  clock_gettime(CLOCK_MONOTONIC, &t);
+
+  return t.tv_sec * 1000000 + t.tv_nsec / 1000;
+}
+
 int main(int argc, char* pArgv[]) {
+  Error error;
+
   const char* pDevice = "/dev/sequencer";
   uint8_t devnum = 1;
 
@@ -175,7 +185,6 @@ int main(int argc, char* pArgv[]) {
   }
 
   const char* pMidiFileName = pArgv[1];
-  Error error;
 
   MidiPlayer player;
 
