@@ -15,6 +15,7 @@ static void listDevices() {
   const char* pDevice = "/dev/sequencer";
 
   int seqfd = open(pDevice, O_WRONLY, 0);
+
   if (seqfd < 0) {
     printf("Error: cannot open %s\n", pDevice);
     exit(1);
@@ -26,6 +27,7 @@ static void listDevices() {
   status = ioctl(seqfd, SNDCTL_SEQ_NRSYNTHS, &synthCount);
 
   struct midi_info midiinfo;
+
   for (int i = 0; i < midiCount; i++) {
     midiinfo.device = i;
     status = ioctl(seqfd, SNDCTL_MIDI_INFO, &midiinfo);
@@ -33,6 +35,7 @@ static void listDevices() {
   }
 
   struct synth_info synthinfo;
+
   for (int i=0; i < synthCount; i++) {
     synthinfo.device = i;
     status = ioctl(seqfd, SNDCTL_SYNTH_INFO, &synthinfo);
@@ -81,51 +84,66 @@ static void sendMidiMsg(int fd, int devnum, MidiEvent e) {
 
 typedef struct MidiPlayer {
   MidiFile midi;
+  MidiEvent event;
   uint32_t uspqn;
-  uint32_t nextEventTimeUs;
 
-  // TODO: move to callback context::
+  // TODO: move to callback context:
   int32_t fd;
   uint8_t devnum;
 } MidiPlayer;
 
-static void midiPlayerInit(MidiPlayer* pPlayer) {
+static Error midiPlayerOpen(MidiPlayer* pPlayer, const char* pFileName) {
+  printf("midiPlayerInit\n");
+
+  Error error;
   static const uint32_t c = 60000000;
   static const uint32_t defaultBpm = 120;
 
   pPlayer->uspqn = c / defaultBpm;
-  pPlayer->nextEventTimeUs = 0;
+
+  if(error = eMidi_open(&pPlayer->midi, pFileName))
+    return error;
+
+  printf("midiPlayerInit 2\n");
+
+  if(error = eMidi_readEvent(&pPlayer->midi, &pPlayer->event))
+    return error;
+
+  printf("midiPlayerInit 3\n");
+
+  return EMIDI_OK;
 }
 
-static int midiPlayerTick(MidiPlayer* pPlayer) {
+static Error midiPlayerTick(MidiPlayer* pPlayer) {
   Error error;
-  MidiEvent e;
 
-  if(error = eMidi_readEvent(&pPlayer->midi, &e)) {
-    printf("Error on reading event: [0x%02X] (Error %d: %s)\n",e.eventId, error,
-        eMidi_errorToStr(error));
+  // TODO: check if current time delta is grater or equal than deltaTime
+//  pPlayer->event.deltaTime;
 
-    return 3;
-  }
-
-  if(e.eventId == MIDI_EVENT_META) {
-    if(e.metaEventId == MIDI_SET_TEMPO)
-      pPlayer->uspqn = e.params.msg.meta.setTempo.usPerQuarterNote;
+  if(pPlayer->event.eventId == MIDI_EVENT_META) {
+    if(pPlayer->event.metaEventId == MIDI_SET_TEMPO)
+      pPlayer->uspqn = pPlayer->event.params.msg.meta.setTempo.usPerQuarterNote;
   }
 
   uint32_t TQPN = pPlayer->midi.header.division.tqpn.TQPN;
-  uint32_t usToWait = (e.deltaTime * pPlayer->uspqn) / TQPN;
+  uint32_t usToWait = (pPlayer->event.deltaTime * pPlayer->uspqn) / TQPN;
 
-  usleep(usToWait);
+  usleep(usToWait); // TODO: remove
 
-  eMidi_printMidiEvent(&e);
-  sendMidiMsg(pPlayer->fd, pPlayer->devnum, e);
+  eMidi_printMidiEvent(&pPlayer->event);
+  sendMidiMsg(pPlayer->fd, pPlayer->devnum, pPlayer->event); // TODO: call event callback
 
-  return (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
+  if(pPlayer->event.eventId == MIDI_EVENT_META && pPlayer->event.metaEventId == MIDI_END_OF_TRACK)
+    return EMIDI_OK_END_OF_FILE;
+
+  if(error = eMidi_readEvent(&pPlayer->midi, &pPlayer->event))
+    return error;
+
+  return EMIDI_OK;
 }
 
 static Error play(MidiPlayer* pPlayer) {
-  while(midiPlayerTick(pPlayer));
+  while(midiPlayerTick(pPlayer) == EMIDI_OK); // TODO: must not block!
 }
 
 int main(int argc, char* pArgv[]) {
@@ -149,17 +167,16 @@ int main(int argc, char* pArgv[]) {
   Error error;
 
   MidiPlayer player;
-  midiPlayerInit(&player);
 
-  player.fd = fd;
-  player.devnum = devnum;
-
-  if(error = eMidi_open(&player.midi, pMidiFileName)) {
+  if(error = midiPlayerOpen(&player, pMidiFileName)) {
     printf("Cannot open file: '%s'\n", pMidiFileName);
     eMidi_printError(error);
 
     return 2;
   }
+
+  player.fd = fd;
+  player.devnum = devnum;
 
   printf("Midi file '%s' opened successfully!\n", pMidiFileName);
 
