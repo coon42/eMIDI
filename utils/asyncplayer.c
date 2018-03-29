@@ -92,24 +92,43 @@ typedef struct MidiPlayer {
   uint8_t devnum;
 } MidiPlayer;
 
-static Error midiPlayerOpen(MidiPlayer* pPlayer, const char* pFileName) {
-  printf("midiPlayerInit\n");
-
+static Error reload(MidiPlayer* pPlayer) {
   Error error;
-  static const uint32_t c = 60000000;
-  static const uint32_t defaultBpm = 120;
-
-  pPlayer->uspqn = c / defaultBpm;
-
-  if(error = eMidi_open(&pPlayer->midi, pFileName))
-    return error;
-
-  printf("midiPlayerInit 2\n");
 
   if(error = eMidi_readEvent(&pPlayer->midi, &pPlayer->event))
     return error;
 
-  printf("midiPlayerInit 3\n");
+  return EMIDI_OK;
+}
+
+static Error shoot(MidiPlayer* pPlayer) {
+  if(pPlayer->event.eventId == MIDI_EVENT_META) {
+    if(pPlayer->event.metaEventId == MIDI_SET_TEMPO)
+      pPlayer->uspqn = pPlayer->event.params.msg.meta.setTempo.usPerQuarterNote;
+  }
+
+  eMidi_printMidiEvent(&pPlayer->event);
+  sendMidiMsg(pPlayer->fd, pPlayer->devnum, pPlayer->event); // TODO: call event callback
+
+  if(pPlayer->event.eventId == MIDI_EVENT_META && pPlayer->event.metaEventId == MIDI_END_OF_TRACK)
+    return EMIDI_OK_END_OF_FILE;
+
+  return EMIDI_OK;
+}
+
+static Error midiPlayerOpen(MidiPlayer* pPlayer, const char* pFileName) {
+  Error error;
+
+  if(error = eMidi_open(&pPlayer->midi, pFileName))
+    return error;
+
+  if(error = reload(pPlayer))
+    return error;
+
+  static const uint32_t c = 60000000;
+  static const uint32_t defaultBpm = 120;
+
+  pPlayer->uspqn = c / defaultBpm;
 
   return EMIDI_OK;
 }
@@ -118,25 +137,17 @@ static Error midiPlayerTick(MidiPlayer* pPlayer) {
   Error error;
 
   // TODO: check if current time delta is grater or equal than deltaTime
-//  pPlayer->event.deltaTime;
-
-  if(pPlayer->event.eventId == MIDI_EVENT_META) {
-    if(pPlayer->event.metaEventId == MIDI_SET_TEMPO)
-      pPlayer->uspqn = pPlayer->event.params.msg.meta.setTempo.usPerQuarterNote;
-  }
+  //  pPlayer->event.deltaTime;
 
   uint32_t TQPN = pPlayer->midi.header.division.tqpn.TQPN;
   uint32_t usToWait = (pPlayer->event.deltaTime * pPlayer->uspqn) / TQPN;
 
   usleep(usToWait); // TODO: remove
 
-  eMidi_printMidiEvent(&pPlayer->event);
-  sendMidiMsg(pPlayer->fd, pPlayer->devnum, pPlayer->event); // TODO: call event callback
+  if(error = shoot(pPlayer))
+    return error;
 
-  if(pPlayer->event.eventId == MIDI_EVENT_META && pPlayer->event.metaEventId == MIDI_END_OF_TRACK)
-    return EMIDI_OK_END_OF_FILE;
-
-  if(error = eMidi_readEvent(&pPlayer->midi, &pPlayer->event))
+  if(error = reload(pPlayer))
     return error;
 
   return EMIDI_OK;
