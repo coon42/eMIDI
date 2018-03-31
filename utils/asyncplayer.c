@@ -45,41 +45,29 @@ static void listDevices() {
 }
 
 static void sendMidiMsg(int fd, int devnum, MidiEvent e) {
-  uint8_t packet[4] = {SEQ_MIDIPUTC, 0, devnum, 0};
+  int numParamBytes = 0;
 
   switch(e.eventId & 0xF0) {
-    case MIDI_EVENT_NOTE_OFF:
-      packet[1] = e.eventId;
-      write(fd, packet, sizeof(packet));
-
-      packet[1] = e.params.msg.noteOff.note;
-      write(fd, packet, sizeof(packet));
-
-      packet[1] = e.params.msg.noteOff.velocity;
-      write(fd, packet, sizeof(packet));
-      break;
-
-    case MIDI_EVENT_NOTE_ON:
-      packet[1] = e.eventId;
-      write(fd, packet, sizeof(packet));
-
-      packet[1] = e.params.msg.noteOn.note;
-      write(fd, packet, sizeof(packet));
-
-      packet[1] = e.params.msg.noteOn.velocity;
-      write(fd, packet, sizeof(packet));
-      break;
-
-    case MIDI_EVENT_PROGRAM_CHANGE:
-      packet[1] = e.eventId;
-      write(fd, packet, sizeof(packet));
-
-      packet[1] = e.params.msg.programChange.programNumber;
-      write(fd, packet, sizeof(packet));
-      break;
+    case MIDI_EVENT_NOTE_OFF:          numParamBytes = 2; break;
+    case MIDI_EVENT_NOTE_ON:           numParamBytes = 2; break;
+//    case MIDI_EVENT_POLY_KEY_PRESSURE: numParamBytes = 2; break;
+//    case MIDI_EVENT_CONTROL_CHANGE:    numParamBytes = 2; break;
+    case MIDI_EVENT_PROGRAM_CHANGE:    numParamBytes = 1; break;
+//    case MIDI_EVENT_CHANNEL_PRESSURE:  numParamBytes = 1; break;
+    case MIDI_EVENT_PITCH_BEND:        numParamBytes = 2; break;
 
     default:
       return;
+  }
+
+  uint8_t packet[4] = { SEQ_MIDIPUTC, 0, devnum, 0 };
+
+  packet[1] = e.eventId;
+  write(fd, packet, sizeof(packet));
+
+  for(int i = 0; i < numParamBytes; ++i) {
+    packet[1] = e.params.pRaw[i];
+    write(fd, packet, sizeof(packet));
   }
 }
 
@@ -164,7 +152,7 @@ static Error midiPlayerTick(MidiPlayer* pPlayer) {
 }
 
 static Error play(MidiPlayer* pPlayer) {
-  while(midiPlayerTick(pPlayer) == EMIDI_OK); // TODO: must not block!
+  while(midiPlayerTick(pPlayer) == EMIDI_OK);
 }
 
 int main(int argc, char* pArgv[]) {
