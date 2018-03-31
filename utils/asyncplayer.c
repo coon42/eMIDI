@@ -83,10 +83,18 @@ static void sendMidiMsg(int fd, int devnum, MidiEvent e) {
   }
 }
 
+static int timeUs() {
+  struct timespec t;
+  clock_gettime(CLOCK_MONOTONIC, &t);
+
+  return t.tv_sec * 1000000 + t.tv_nsec / 1000;
+}
+
 typedef struct MidiPlayer {
   MidiFile midi;
   MidiEvent event;
   uint32_t uspqn;
+  uint32_t lastReloadTimeUs;
 
   // TODO: move to callback context:
   int32_t fd;
@@ -98,6 +106,8 @@ static Error reload(MidiPlayer* pPlayer) {
 
   if(error = eMidi_readEvent(&pPlayer->midi, &pPlayer->event))
     return error;
+
+  pPlayer->lastReloadTimeUs = timeUs();
 
   return EMIDI_OK;
 }
@@ -137,13 +147,12 @@ static Error midiPlayerOpen(MidiPlayer* pPlayer, const char* pFileName) {
 static Error midiPlayerTick(MidiPlayer* pPlayer) {
   Error error;
 
-  // TODO: check if current time delta is grater or equal than deltaTime
-  //  pPlayer->event.deltaTime;
+  uint32_t tqpn = pPlayer->midi.header.division.tqpn.TQPN;
+  uint32_t usToWait = (pPlayer->event.deltaTime * pPlayer->uspqn) / tqpn;
+  uint32_t usPassed = timeUs() - pPlayer->lastReloadTimeUs;
 
-  uint32_t TQPN = pPlayer->midi.header.division.tqpn.TQPN;
-  uint32_t usToWait = (pPlayer->event.deltaTime * pPlayer->uspqn) / TQPN;
-
-  usleep(usToWait); // TODO: remove
+  if(usPassed < usToWait)
+    return EMIDI_OK;
 
   if(error = shoot(pPlayer))
     return error;
@@ -156,13 +165,6 @@ static Error midiPlayerTick(MidiPlayer* pPlayer) {
 
 static Error play(MidiPlayer* pPlayer) {
   while(midiPlayerTick(pPlayer) == EMIDI_OK); // TODO: must not block!
-}
-
-static int timeUs() {
-  struct timespec t;
-  clock_gettime(CLOCK_MONOTONIC, &t);
-
-  return t.tv_sec * 1000000 + t.tv_nsec / 1000;
 }
 
 int main(int argc, char* pArgv[]) {
