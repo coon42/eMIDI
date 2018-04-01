@@ -85,6 +85,10 @@ typedef struct MidiStatusParams {
       struct {
         uint32_t usPerQuarterNote;
       } setTempo;
+
+      struct {
+        uint8_t port;
+      } midiPort;
     } meta;
   } msg;
 
@@ -145,6 +149,7 @@ enum MetaEvents {
   MIDI_META_CUE_POINT           = 0x07,
   // 0x08 .. 0x0F reserved
   MIDI_META_MIDI_CHANNEL_PREFIX = 0x20,
+  MIDI_META_MIDI_PORT           = 0x21, // Non-Standard
   MIDI_END_OF_TRACK             = 0x2F,
   MIDI_SET_TEMPO                = 0x51,
   MIDI_SMPTE_OFFSET             = 0x54,

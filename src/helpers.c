@@ -63,6 +63,7 @@ const char* eMidi_metaEventToStr(int metaEventId) {
     case MIDI_META_MARKER:              return "Marker";
     case MIDI_META_CUE_POINT:           return "Cue Point";
     case MIDI_META_MIDI_CHANNEL_PREFIX: return "MIDI Channel Prefix";
+    case MIDI_META_MIDI_PORT:           return "MIDI Port";
     case MIDI_END_OF_TRACK:             return "End of Track";
     case MIDI_SET_TEMPO:                return "Set Tempo";
     case MIDI_SMPTE_OFFSET:             return "SMPTE Offset";
@@ -470,6 +471,10 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
     switch(e->metaEventId) {
       case MIDI_SET_TEMPO:
         printf("(%d bpm)", prvUspqn2bpm(e->params.msg.meta.setTempo.usPerQuarterNote));
+        break;
+
+      case MIDI_META_MIDI_PORT:
+        printf("(port: %d)", e->params.msg.meta.midiPort.port);
         break;
 
       default:

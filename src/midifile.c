@@ -240,10 +240,21 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
         return error;
 
       switch(pEvent->metaEventId) {
+        case MIDI_META_MIDI_PORT: {
+          uint8_t port;
+
+          if(error = prvReadVoid(pMidiFile->p, &port, 1, NULL))
+            return error;
+
+          pEvent->params.msg.meta.midiPort.port = port;
+
+          break;
+        }
+
         case MIDI_SET_TEMPO: {
           uint32_t uspqn;
 
-          if(error = prvReadVoid(pMidiFile->p, &uspqn, pEvent->metaEventLen, NULL))
+          if(error = prvReadVoid(pMidiFile->p, &uspqn, 3, NULL))
             return error;
 
           pEvent->params.msg.meta.setTempo.usPerQuarterNote = BSWAP_32(uspqn) >> 8;
