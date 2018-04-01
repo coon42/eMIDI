@@ -275,6 +275,20 @@ const char* eMidi_drumToStr(uint8_t midiNote) {
   }
 }
 
+const char* eMidi_controllerToStr(uint8_t controllerNo) {
+  switch(controllerNo) {
+    case 1:   return "Modulation";
+    case 7:   return "Volume";
+    case 10:  return "Pan";
+    case 11:  return "Expression";
+    case 64:  return "Sustain";
+    case 121: return "Reset All Controllers";
+    case 123: return "All Notes Off";
+
+    default: return "Unknown controller";
+  }
+}
+
 const char* eMidi_programToStr(uint8_t programNo) {
   switch(programNo + 1) {
     case   1: return "Acoustic Grand Piano";
@@ -448,7 +462,8 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
       break;
 
     case MIDI_EVENT_CONTROL_CHANGE:
-      printf(", Controller: %d, value: %d", e->params.msg.controlChange.control, e->params.msg.controlChange.value);
+      printf(", Controller: %s (%d), value: %d", eMidi_controllerToStr(e->params.msg.controlChange.control),
+          e->params.msg.controlChange.control, e->params.msg.controlChange.value);
       break;
 
     case MIDI_EVENT_PROGRAM_CHANGE:
