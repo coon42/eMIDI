@@ -69,6 +69,11 @@ typedef struct MidiStatusParams {
     } noteOn;
 
     struct {
+      uint8_t control;
+      uint8_t value;
+    } controlChange;
+
+    struct {
       uint8_t programNumber;
     } programChange;
 

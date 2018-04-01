@@ -447,6 +447,7 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
       break;
 
     case MIDI_EVENT_CONTROL_CHANGE:
+      printf(", Controller: %d, value: %d", e->params.msg.controlChange.control, e->params.msg.controlChange.value);
       break;
 
     case MIDI_EVENT_PROGRAM_CHANGE:

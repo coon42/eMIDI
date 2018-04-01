@@ -189,7 +189,8 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
     case MIDI_EVENT_CONTROL_CHANGE:
       prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
       prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);
-      // TODO: implement
+      pEvent->params.msg.controlChange.control = pEvent->params.pRaw[0];
+      pEvent->params.msg.controlChange.value   = pEvent->params.pRaw[1];
       return EMIDI_OK; // TODO: DRY return code
 
     case MIDI_EVENT_PROGRAM_CHANGE:
