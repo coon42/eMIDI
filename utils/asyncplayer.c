@@ -10,28 +10,37 @@
 #include "midifile.h"
 #include "helpers.h"
 
+typedef void(*UserEventCallback_t)(struct MidiEvent* pEvent, void* pContext);
+
+typedef struct MidiPlayer {
+  MidiFile midi;
+  MidiEvent event;
+  uint32_t uspqn;
+  uint32_t lastReloadTimeUs;
+  UserEventCallback_t pUserEventCallback;
+  void* pContext;
+} MidiPlayer;
+
 static void listDevices() {
-  int status;
-  int midiCount;
   const char* pDevice = "/dev/sequencer";
+  int fd = open(pDevice, O_WRONLY, 0);
 
-  int seqfd = open(pDevice, O_WRONLY, 0);
-
-  if (seqfd < 0) {
+  if (fd < 0) {
     printf("Error: cannot open %s\n", pDevice);
     exit(1);
   }
 
-  status = ioctl(seqfd, SNDCTL_SEQ_NRMIDIS, &midiCount);
+  int midiCount;
+  int status = ioctl(fd, SNDCTL_SEQ_NRMIDIS, &midiCount);
 
   int synthCount;
-  status = ioctl(seqfd, SNDCTL_SEQ_NRSYNTHS, &synthCount);
+  status = ioctl(fd, SNDCTL_SEQ_NRSYNTHS, &synthCount);
 
   struct midi_info midiinfo;
 
   for (int i = 0; i < midiCount; i++) {
     midiinfo.device = i;
-    status = ioctl(seqfd, SNDCTL_MIDI_INFO, &midiinfo);
+    status = ioctl(fd, SNDCTL_MIDI_INFO, &midiinfo);
     printf("MIDI Port %d: %s\n", i, midiinfo.name);
   }
 
@@ -39,35 +48,8 @@ static void listDevices() {
 
   for (int i=0; i < synthCount; i++) {
     synthinfo.device = i;
-    status = ioctl(seqfd, SNDCTL_SYNTH_INFO, &synthinfo);
+    status = ioctl(fd, SNDCTL_SYNTH_INFO, &synthinfo);
     printf("Synth Port %d: %s\n", i, synthinfo.name);
-  }
-}
-
-static void sendMidiMsg(int fd, int devnum, MidiEvent e) {
-  int numParamBytes = 0;
-
-  switch(e.eventId & 0xF0) {
-    case MIDI_EVENT_NOTE_OFF:          numParamBytes = 2; break;
-    case MIDI_EVENT_NOTE_ON:           numParamBytes = 2; break;
-//    case MIDI_EVENT_POLY_KEY_PRESSURE: numParamBytes = 2; break;
-//    case MIDI_EVENT_CONTROL_CHANGE:    numParamBytes = 2; break;
-    case MIDI_EVENT_PROGRAM_CHANGE:    numParamBytes = 1; break;
-//    case MIDI_EVENT_CHANNEL_PRESSURE:  numParamBytes = 1; break;
-    case MIDI_EVENT_PITCH_BEND:        numParamBytes = 2; break;
-
-    default:
-      return;
-  }
-
-  uint8_t packet[4] = { SEQ_MIDIPUTC, 0, devnum, 0 };
-
-  packet[1] = e.eventId;
-  write(fd, packet, sizeof(packet));
-
-  for(int i = 0; i < numParamBytes; ++i) {
-    packet[1] = e.params.pRaw[i];
-    write(fd, packet, sizeof(packet));
   }
 }
 
@@ -78,16 +60,9 @@ static int timeUs() {
   return t.tv_sec * 1000000 + t.tv_nsec / 1000;
 }
 
-typedef struct MidiPlayer {
-  MidiFile midi;
-  MidiEvent event;
-  uint32_t uspqn;
-  uint32_t lastReloadTimeUs;
-
-  // TODO: move to callback context:
-  int32_t fd;
-  uint8_t devnum;
-} MidiPlayer;
+static void eventCallback(MidiPlayer* pPlayer, void* pContext) {
+  pPlayer->pUserEventCallback(&pPlayer->event, pPlayer->pContext);
+}
 
 static Error reload(MidiPlayer* pPlayer) {
   Error error;
@@ -106,8 +81,7 @@ static Error shoot(MidiPlayer* pPlayer) {
       pPlayer->uspqn = pPlayer->event.params.msg.meta.setTempo.usPerQuarterNote;
   }
 
-  eMidi_printMidiEvent(&pPlayer->event);
-  sendMidiMsg(pPlayer->fd, pPlayer->devnum, pPlayer->event); // TODO: call event callback
+  eventCallback(pPlayer, pPlayer->pContext);
 
   if(pPlayer->event.eventId == MIDI_EVENT_META && pPlayer->event.metaEventId == MIDI_END_OF_TRACK)
     return EMIDI_OK_END_OF_FILE;
@@ -115,7 +89,8 @@ static Error shoot(MidiPlayer* pPlayer) {
   return EMIDI_OK;
 }
 
-static Error midiPlayerOpen(MidiPlayer* pPlayer, const char* pFileName) {
+static Error midiPlayerOpen(MidiPlayer* pPlayer, const char* pFileName,
+    UserEventCallback_t pUserEventCallback, void* pContext) {
   Error error;
 
   if(error = eMidi_open(&pPlayer->midi, pFileName))
@@ -128,6 +103,8 @@ static Error midiPlayerOpen(MidiPlayer* pPlayer, const char* pFileName) {
   static const uint32_t defaultBpm = 120;
 
   pPlayer->uspqn = c / defaultBpm;
+  pPlayer->pUserEventCallback = pUserEventCallback;
+  pPlayer->pContext = pContext;
 
   return EMIDI_OK;
 }
@@ -155,15 +132,50 @@ static Error play(MidiPlayer* pPlayer) {
   while(midiPlayerTick(pPlayer) == EMIDI_OK);
 }
 
+typedef struct MyContext {
+  int32_t fd;
+  uint8_t devnum;
+} MyContext;
+
+static void userEventCallback(MidiEvent* pEvent, void* pContext) {
+  MyContext* pCtx = (MyContext*)pContext;
+
+  int numParamBytes = 0;
+
+  switch(pEvent->eventId & 0xF0) {
+    case MIDI_EVENT_NOTE_OFF:          numParamBytes = 2; break;
+    case MIDI_EVENT_NOTE_ON:           numParamBytes = 2; break;
+//    case MIDI_EVENT_POLY_KEY_PRESSURE: numParamBytes = 2; break;
+//    case MIDI_EVENT_CONTROL_CHANGE:    numParamBytes = 2; break;
+    case MIDI_EVENT_PROGRAM_CHANGE:    numParamBytes = 1; break;
+//    case MIDI_EVENT_CHANNEL_PRESSURE:  numParamBytes = 1; break;
+    case MIDI_EVENT_PITCH_BEND:        numParamBytes = 2; break;
+
+    default:
+      return;
+  }
+
+  uint8_t packet[4] = { SEQ_MIDIPUTC, 0, pCtx->devnum, 0 };
+
+  packet[1] = pEvent->eventId;
+  write(pCtx->fd, packet, sizeof(packet));
+
+  for(int i = 0; i < numParamBytes; ++i) {
+    packet[1] = pEvent->params.pRaw[i];
+    write(pCtx->fd, packet, sizeof(packet));
+  }
+
+  eMidi_printMidiEvent(pEvent);
+}
+
 int main(int argc, char* pArgv[]) {
-  Error error;
-
   const char* pDevice = "/dev/sequencer";
-  uint8_t devnum = 1;
 
-  // open the OSS device for writing:
-  int fd = open(pDevice, O_WRONLY, 0);
-  if(fd < 0) {
+  MyContext ctx;
+  ctx.fd = open(pDevice, O_WRONLY, 0);
+  ctx.devnum = 1;
+
+  if(ctx.fd < 0) {
     printf("Error: cannot open %s\n", pDevice);
     exit(1);
   }
@@ -176,17 +188,15 @@ int main(int argc, char* pArgv[]) {
 
   const char* pMidiFileName = pArgv[1];
 
+  Error error;
   MidiPlayer player;
 
-  if(error = midiPlayerOpen(&player, pMidiFileName)) {
+  if(error = midiPlayerOpen(&player, pMidiFileName, userEventCallback, &ctx)) {
     printf("Cannot open file: '%s'\n", pMidiFileName);
     eMidi_printError(error);
 
     return 2;
   }
-
-  player.fd = fd;
-  player.devnum = devnum;
 
   printf("Midi file '%s' opened successfully!\n", pMidiFileName);
 
@@ -194,7 +204,7 @@ int main(int argc, char* pArgv[]) {
     return error;
 
   eMidi_close(&player.midi);
-  close(fd);
+  close(ctx.fd);
 
   return 0;
 }

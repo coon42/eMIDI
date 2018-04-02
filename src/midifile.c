@@ -268,7 +268,6 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
             return error;
       }
 
-      // CHECKME: can META events be used for running status?
       break;
     }
 
