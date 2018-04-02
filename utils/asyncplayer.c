@@ -60,7 +60,7 @@ static int timeUs() {
   return t.tv_sec * 1000000 + t.tv_nsec / 1000;
 }
 
-static void eventCallback(MidiPlayer* pPlayer, void* pContext) {
+static void dispatchEvent(MidiPlayer* pPlayer) {
   pPlayer->pUserEventCallback(&pPlayer->event, pPlayer->pContext);
 }
 
@@ -81,7 +81,7 @@ static Error shoot(MidiPlayer* pPlayer) {
       pPlayer->uspqn = pPlayer->event.params.msg.meta.setTempo.usPerQuarterNote;
   }
 
-  eventCallback(pPlayer, pPlayer->pContext);
+  dispatchEvent(pPlayer);
 
   if(pPlayer->event.eventId == MIDI_EVENT_META && pPlayer->event.metaEventId == MIDI_END_OF_TRACK)
     return EMIDI_OK_END_OF_FILE;
