@@ -3,9 +3,9 @@ CXX = g++
 CFLAGS   = -std=c99
 CXXFLAGS = -std=c++17
 
-.PHONY: all clean test dump player_old asyncplayer gcode
+.PHONY: all clean test dump midiplayer player_old asyncplayer gcode
 
-all: dump player_old asyncplayer gcode
+all: dump midiplayer player_old asyncplayer gcode
 
 clean:
 	rm -rf obj
@@ -15,6 +15,7 @@ test: bin/tests
 	cd tests; ../bin/tests
 
 dump: bin/dump
+midiplayer: bin/midiplayer
 player_old: bin/player_old
 asyncplayer: bin/asyncplayer
 gcode: bin/gcode
@@ -28,11 +29,17 @@ bin:
 obj/midifile.o: obj src/midifile.c
 	$(CC) $(CFLAGS) -Isrc -c src/midifile.c -o obj/midifile.o
 
+obj/midiplayer.o: obj src/midiplayer.c
+	$(CC) $(CFLAGS) -Isrc -c src/midiplayer.c -o obj/midiplayer.o
+
 obj/helpers.o: obj src/helpers.c
 	$(CC) $(CFLAGS) -Isrc -c src/helpers.c -o obj/helpers.o
 
 bin/dump: bin obj/midifile.o obj/helpers.o utils/dump.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o utils/dump.c -o bin/dump
+
+bin/midiplayer: bin obj/midiplayer.o obj/helpers.o src/midiplayer.c
+	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o src/midiplayer.c -o bin/midiplayer
 
 bin/player_old: bin obj/midifile.o obj/helpers.o utils/player_old.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o utils/player_old.c -o bin/player_old
