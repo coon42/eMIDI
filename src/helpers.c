@@ -570,7 +570,7 @@ Error eMidi_printError(Error error) {
   return EMIDI_OK;
 }
 
-Error eMidi_printFileInfo(MidiFile* pMidiFile) {
+Error eMidi_printFileInfo(const MidiFile* pMidiFile) {
   printf("File size: %d bytes\n", pMidiFile->size);
   printf("\n");
   printf("MIDI header:\n");
