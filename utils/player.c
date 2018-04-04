@@ -115,7 +115,9 @@ int main(int argc, char* pArgv[]) {
   if(error = play(&player))
     return error;
 
-  eMidi_close(&player.midi);
+  if(error = eMidi_closePlayer(&player))
+    return error;
+
   close(ctx.fd);
 
   return 0;

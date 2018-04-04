@@ -62,6 +62,15 @@ Error eMidi_openPlayer(MidiPlayer* pPlayer, const char* pFileName,
   return EMIDI_OK;
 }
 
+Error eMidi_closePlayer(MidiPlayer* pPlayer) {
+  Error error;
+
+  if (error = eMidi_close(&pPlayer->midi))
+    return error;
+
+  return EMIDI_OK;
+}
+
 Error eMidi_playerTick(MidiPlayer* pPlayer) {
   Error error;
 

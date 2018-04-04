@@ -18,6 +18,7 @@ typedef struct MidiPlayer {
 Error eMidi_openPlayer(MidiPlayer* pPlayer, const char* pFileName,
     UserEventCallback_t pUserEventCallback, void* pContext);
 
+Error eMidi_closePlayer(MidiPlayer* pPlayer);
 Error eMidi_playerTick(MidiPlayer* pPlayer);
 
 #endif // !MIDIPLAYER_H
