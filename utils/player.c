@@ -49,7 +49,7 @@ typedef struct MyContext {
   uint8_t devnum;
 } MyContext;
 
-static void userEventCallback(MidiEvent* pEvent, void* pContext) {
+static void userEventCallback(const MidiEvent* pEvent, void* pContext) {
   MyContext* pCtx = (MyContext*)pContext;
 
   int numParamBytes = 0;

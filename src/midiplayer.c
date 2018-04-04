@@ -13,7 +13,7 @@ static int timeUs() {
 }
 // -
 
-static void dispatchEvent(MidiPlayer* pPlayer) {
+static void dispatchEvent(const MidiPlayer* pPlayer) {
   pPlayer->pUserEventCallback(&pPlayer->event, pPlayer->pContext);
 }
 

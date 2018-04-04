@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "midifile.h"
 
-typedef void(*UserEventCallback_t)(struct MidiEvent* pEvent, void* pContext);
+typedef void(*UserEventCallback_t)(const MidiEvent* pEvent, void* pContext);
 
 typedef struct MidiPlayer {
   MidiFile midi;
