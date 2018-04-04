@@ -15,7 +15,6 @@ test: bin/tests
 	cd tests; ../bin/tests
 
 dump: bin/dump
-midiplayer: bin/midiplayer
 player_old: bin/player_old
 asyncplayer: bin/asyncplayer
 gcode: bin/gcode
@@ -38,14 +37,11 @@ obj/helpers.o: obj src/helpers.c
 bin/dump: bin obj/midifile.o obj/helpers.o utils/dump.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o utils/dump.c -o bin/dump
 
-bin/midiplayer: bin obj/midiplayer.o obj/helpers.o src/midiplayer.c
-	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o src/midiplayer.c -o bin/midiplayer
-
 bin/player_old: bin obj/midifile.o obj/helpers.o utils/player_old.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o utils/player_old.c -o bin/player_old
 
-bin/asyncplayer: bin obj/midifile.o obj/helpers.o utils/asyncplayer.c
-	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o utils/asyncplayer.c -o bin/asyncplayer
+bin/asyncplayer: bin obj/midifile.o obj/midiplayer.o obj/helpers.o utils/asyncplayer.c
+	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/midiplayer.o obj/helpers.o utils/asyncplayer.c -o bin/asyncplayer
 
 bin/gcode: bin obj/midifile.o obj/helpers.o utils/gcode.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o utils/gcode.c -o bin/gcode

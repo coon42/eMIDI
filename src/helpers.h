@@ -1,7 +1,9 @@
 #ifndef _HELPERS_H
 #define _HELPERS_H
 
+#include <stdint.h>
 #include "emiditypes.h"
+#include "midifile.h"
 
 const char* eMidi_errorToStr(Error error);
 const char* eMidi_eventToStr(uint8_t eventCode);
