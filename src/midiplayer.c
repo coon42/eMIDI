@@ -1,14 +1,7 @@
 #define _DEFAULT_SOURCE
 #include <unistd.h>
-
 #include <time.h>
-#include <sys/ioctl.h>
-#include <linux/soundcard.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include "midifile.h"
-#include "helpers.h"
+
 #include "midiplayer.h"
 
 // TODO: move to HAL:

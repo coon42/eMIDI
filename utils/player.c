@@ -1,6 +1,4 @@
-#define _DEFAULT_SOURCE
 #include <unistd.h>
-
 #include <time.h>
 #include <sys/ioctl.h>
 #include <linux/soundcard.h>

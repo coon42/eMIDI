@@ -2,6 +2,7 @@
 #define MIDIPLAYER_H
 
 #include <stdint.h>
+#include "midifile.h"
 
 typedef void(*UserEventCallback_t)(struct MidiEvent* pEvent, void* pContext);
 
