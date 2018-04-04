@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include "emiditypes.h"
 
 typedef struct MidiChunkInfo {
   char pChunk[4];
@@ -157,8 +158,6 @@ enum MetaEvents {
   MIDI_KEY_SIGNATURE            = 0x59,
   MIDI_SEQUENCER_SPECIFIC       = 0x7F
 };
-
-typedef uint32_t Error;
 
 enum {
   EMIDI_OK                     = 0x0000,
