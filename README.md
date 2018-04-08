@@ -24,22 +24,25 @@ MIDI library optimized for beeing used on embedded devices
   * Opening and closing of MIDI files and validation of header.
   * Reading of all midi events of any midi0 file (data bytes of some events are ignored)
   * Support of running status events
+  * Non-Blocking MIDI player
   * Supported channel events
     * NoteOff
-    * NoteOn 
+    * NoteOn
     * Control Change
     * Program Change
     * Pitch Bend
   * Supported META events
-    * End of Track          
-    * Set Tempo       
+    * End of Track
+    * Set Tempo
+    * Midi Port
     * All other events are ignored in first iteration and will be supported later
 
 ### Planned ###
+  * A cache for the MIDI player to avoid playback timing issues due to slow media access
   * Creation of MIDI files
+  * Support of MIDI 1 files
   * MIDI 1 to MIDI 0 converter
   * "Compression" - Use running status events plus Note-On with zero velocity for Note-Off
-  * Support of MIDI 1 files
 
 ### Contraints ###
   * Only little endian platforms supported
