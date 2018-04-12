@@ -1,17 +1,6 @@
-#define _DEFAULT_SOURCE
-#include <unistd.h>
-#include <time.h>
-
 #include "midiplayer.h"
 
-// TODO: move to HAL:
-static int timeUs() {
-  struct timespec t;
-  clock_gettime(CLOCK_MONOTONIC, &t);
-
-  return t.tv_sec * 1000000 + t.tv_nsec / 1000;
-}
-// -
+int eMidi_halTimeUs();
 
 static void dispatchEvent(const MidiPlayer* pPlayer) {
   pPlayer->pUserEventCallback(&pPlayer->event, pPlayer->pContext);
@@ -23,7 +12,7 @@ static Error reload(MidiPlayer* pPlayer) {
   if(error = eMidi_readEvent(&pPlayer->midi, &pPlayer->event))
     return error;
 
-  pPlayer->lastReloadTimeUs = timeUs();
+  pPlayer->lastReloadTimeUs = eMidi_halTimeUs();
 
   return EMIDI_OK;
 }
@@ -76,7 +65,7 @@ Error eMidi_playerTick(MidiPlayer* pPlayer) {
 
   uint32_t tqpn = pPlayer->midi.header.division.tqpn.TQPN;
   uint32_t usToWait = (pPlayer->event.deltaTime * pPlayer->uspqn) / tqpn;
-  uint32_t usPassed = timeUs() - pPlayer->lastReloadTimeUs;
+  uint32_t usPassed = eMidi_halTimeUs() - pPlayer->lastReloadTimeUs;
 
   if(usPassed < usToWait)
     return EMIDI_OK;

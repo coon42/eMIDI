@@ -24,6 +24,9 @@ obj:
 bin:
 	mkdir bin
 
+obj/emidi_linux.o: obj src/hal/emidi_linux.c
+	$(CC) $(CFLAGS) -Isrc -c src/hal/emidi_linux.c -o obj/emidi_linux.o
+
 obj/midifile.o: obj src/midifile.c
 	$(CC) $(CFLAGS) -Isrc -c src/midifile.c -o obj/midifile.o
 
@@ -36,8 +39,8 @@ obj/helpers.o: obj src/helpers.c
 bin/dump: bin obj/midifile.o obj/helpers.o utils/dump.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o utils/dump.c -o bin/dump
 
-bin/player: bin obj/midifile.o obj/midiplayer.o obj/helpers.o utils/player.c
-	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/midiplayer.o obj/helpers.o utils/player.c -o bin/player
+bin/player: bin obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_linux.o utils/player.c
+	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_linux.o utils/player.c -o bin/player
 
 bin/gcode: bin obj/midifile.o obj/helpers.o utils/gcode.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o utils/gcode.c -o bin/gcode
