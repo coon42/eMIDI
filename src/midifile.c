@@ -2,8 +2,13 @@
 #include "midifile.h"
 #include "mybyteswap.h"
 
+FILE* eMidi_halFopen(const char* pPathName, const char* pMode);
+int eMidi_halFclose(FILE* pStream);
+long eMidi_halFtell(FILE* pStream);
+int eMidi_halFseek(FILE* pStream, long offset, int whence);
+
 static Error prvSkipBytes(FILE* p, int len) {
-  if(fseek(p, len, SEEK_CUR))
+  if(eMidi_halFseek(p, len, SEEK_CUR))
     return EMIDI_UNEXPECTED_END_OF_FILE;
 
   return EMIDI_OK;
@@ -60,9 +65,9 @@ static Error prvReadVarLen(FILE* p, uint32_t* pLen) {
 }
 
 static uint32_t prvGetFileSize(FILE* p) {
-  fseek(p, 0, SEEK_END);
-  uint32_t fileSize = ftell(p);
-  fseek(p, 0, SEEK_SET);
+  eMidi_halFseek(p, 0, SEEK_END);
+  uint32_t fileSize = eMidi_halFtell(p);
+  eMidi_halFseek(p, 0, SEEK_SET);
 
   return fileSize;
 }
@@ -71,7 +76,7 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(!pMidiFile)
     return EMIDI_INVALID_HANDLE;
 
-  FILE* p = fopen(pFileName, "rb");
+  FILE* p = eMidi_halFopen(pFileName, "rb");
 
   if(!p)
     return EMIDI_CANNOT_OPEN_FILE;
@@ -124,7 +129,7 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   pMidiFile->p = p;
   pMidiFile->size = fileSize;
   pMidiFile->header = header;
-  pMidiFile->track.startPos = ftell(p);
+  pMidiFile->track.startPos = eMidi_halFtell(p);
   pMidiFile->track.pos = ftell(p);
   pMidiFile->track.len = chunkInfo.length;
   pMidiFile->prevEventId = 0;
@@ -137,7 +142,7 @@ Error eMidi_close(MidiFile* pMidiFile) {
     return EMIDI_INVALID_HANDLE;
 
   if (pMidiFile->p)
-    fclose(pMidiFile->p);
+    eMidi_halFclose(pMidiFile->p);
 
   return EMIDI_OK;
 }
@@ -160,7 +165,7 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
     pEvent->eventId = pMidiFile->prevEventId;
 
     // TODO: do not read first data byte again. Skip second read instead:
-    fseek(pMidiFile->p, -1, SEEK_CUR);
+    eMidi_halFseek(pMidiFile->p, -1, SEEK_CUR);
   }
 
   // First check for channel messages:
