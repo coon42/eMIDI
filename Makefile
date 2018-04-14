@@ -45,6 +45,6 @@ bin/player: bin obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_linux.o 
 bin/gcode: bin obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/gcode.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/gcode.c -o bin/gcode
 
-bin/tests: bin obj/midifile.o tests/tests.cpp
-	$(CXX) $(CXXFLAGS) obj/midifile.o tests/tests.cpp -o bin/tests
+bin/tests: bin obj/midifile.o obj/emidi_linux.o tests/tests.cpp
+	$(CXX) $(CXXFLAGS) obj/midifile.o obj/emidi_linux.o tests/tests.cpp -o bin/tests
 
