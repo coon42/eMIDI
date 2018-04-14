@@ -1,11 +1,7 @@
 #include <string.h>
 #include "midifile.h"
 #include "mybyteswap.h"
-
-FILE* eMidi_halFopen(const char* pPathName, const char* pMode);
-int eMidi_halFclose(FILE* pStream);
-long eMidi_halFtell(FILE* pStream);
-int eMidi_halFseek(FILE* pStream, long offset, int whence);
+#include "hal/emidi_hal.h"
 
 static Error prvSkipBytes(FILE* p, int len) {
   if(eMidi_halFseek(p, len, SEEK_CUR))

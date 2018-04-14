@@ -1,6 +1,5 @@
 #include "midiplayer.h"
-
-int eMidi_halTimeUs();
+#include "hal/emidi_hal.h"
 
 static void dispatchEvent(const MidiPlayer* pPlayer) {
   pPlayer->pUserEventCallback(&pPlayer->event, pPlayer->pContext);
