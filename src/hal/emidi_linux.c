@@ -27,6 +27,10 @@ int eMidi_fseek(FILE* pStream, long offset, int whence) {
   return fseek(pStream, offset, whence);
 }
 
+size_t eMidi_fread(void* p, size_t size, size_t nmemb, FILE* pStream) {
+  return fread(p, size, nmemb, pStream);
+}
+
 size_t eMidi_fwrite(const void* p, size_t size, size_t nmemb, FILE* pStream) {
   return fwrite(p, size, nmemb, pStream);
 }

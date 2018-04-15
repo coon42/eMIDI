@@ -11,7 +11,7 @@ static Error prvSkipBytes(FILE* p, int len) {
 }
 
 static Error prvReadVoid(FILE* p, void* pOut, int len, int* pNumBytesRead) {
-  int n = fread(pOut, 1, len, p);
+  int n = eMidi_fread(pOut, 1, len, p);
 
   if(pNumBytesRead)
     *pNumBytesRead = n;
