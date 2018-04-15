@@ -4,10 +4,11 @@
 #include <string.h>
 #include "midifile.h"
 #include "helpers.h"
+#include "hal/emidi_hal.h"
 
 static void writeCmd(FILE* p, const char* pCmd) {
-  fwrite(pCmd, 1, strlen(pCmd), p);
-  fwrite("\r\n", 1, 2, p);
+  eMidi_fwrite(pCmd, 1, strlen(pCmd), p);
+  eMidi_fwrite("\r\n", 1, 2, p);
 }
 
 static void writeMidiNote(FILE* p, uint8_t axisId, uint8_t note, uint32_t durationUs) {
@@ -34,7 +35,7 @@ int main(int argc, char* pArgv[]) {
 
   printf("Midi file '%s' opened successfully!\n", pMidiFileName);
 
-  FILE* p = fopen("gcode.nc", "w");
+  FILE* p = eMidi_fopen("gcode.nc", "w");
 
   writeCmd(p, "G21"); // Unit selection: millimeters
   writeCmd(p, "G90"); // Absolute distance mode
@@ -70,8 +71,7 @@ int main(int argc, char* pArgv[]) {
   writeCmd(p, "M02");
   writeCmd(p, "");
 
-  fclose(p);
-
+  eMidi_fclose(p);
   eMidi_close(&midi);
 
   return 0;
