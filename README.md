@@ -128,3 +128,12 @@ If /dev/sequencer is not showing up you also meight execute:
 <code>
 sudo modprobe snd-seq-oss
 </code>
+
+And let is start on each boot by opening 
+
+**/etc/modules-load.d/modules.conf**
+
+and adding:
+<code>
+snd-seq-oss
+</code>
