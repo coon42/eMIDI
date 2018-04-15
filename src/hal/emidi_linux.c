@@ -27,6 +27,10 @@ int eMidi_fseek(FILE* pStream, long offset, int whence) {
   return fseek(pStream, offset, whence);
 }
 
+size_t eMidi_fwrite(const void* p, size_t size, size_t nmemb, FILE* pStream) {
+  return fwrite(p, size, nmemb, pStream);
+}
+
 int eMidi_printf(const char* pFormat, ...) {
   va_list args;
   va_start(args, pFormat);
