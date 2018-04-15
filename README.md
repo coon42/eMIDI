@@ -105,26 +105,26 @@ Create a file at
 Insert the following content:
 
 <code>
-[Unit]
-Description=FluidSynth launched in server mode
-After=sound.target
+ [Unit]
+ Description=FluidSynth launched in server mode
+ After=sound.target
 
-[Service]
-ExecStart=/usr/bin/fluidsynth -a pulseaudio -m alsa_seq -i -l -s -p FluidSynth /usr/share/soundfonts/FluidR3_GM.sf2
+ [Service]
+ ExecStart=/usr/bin/fluidsynth -a pulseaudio -m alsa_seq -i -l -s -p FluidSynth /usr/share/soundfonts/FluidR3_GM.sf2
 
-[Install]
-WantedBy=default.target
+ [Install]
+ WantedBy=default.target
 </code>
 
 Execute:
 
 <code>
-systemctl --user start fluidsynth.service
-systemctl --user enable fluidsynth.service
+ systemctl --user start fluidsynth.service
+ systemctl --user enable fluidsynth.service
 </code>
 
 If /dev/sequencer is not showing up you also meight execute:
 
 <code>
-sudo modprobe snd-seq-oss
+ sudo modprobe snd-seq-oss
 </code>
