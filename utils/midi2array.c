@@ -18,8 +18,29 @@ static Error checkIfValidMidiFile(const char* pFileName) {
   return EMIDI_OK;
 }
 
-static void writeArray(const FILE* pMidiFile, FILE* pSourceFile) {
-  // TODO: implement
+static void writeStr(FILE* pSourceFile, const char* pStr) {
+  eMidi_fwrite(pStr, 1, strlen(pStr), pSourceFile);
+}
+
+static void writeArray(FILE* pMidiFile, FILE* pSourceFile) {
+  writeStr(pSourceFile, "const unsigned char pMidi[] = {");
+
+  unsigned char b;
+
+  for(int i = 0; eMidi_fread(&b, 1, 1, pMidiFile) == 1; ++i) {
+    if(i % 20 == 0) // limit text to about 100 columns
+      writeStr(pSourceFile, "\n  ");
+
+    eMidi_fread(&b, 1, 1, pMidiFile);
+
+    char pNum[32];
+    snprintf(pNum, sizeof(pNum), "0x%02X,", (int)b);
+
+    writeStr(pSourceFile, pNum);
+  }
+
+  writeStr(pSourceFile, "\n");
+  writeStr(pSourceFile, "};\n");
 }
 
 int main(int argc, char* pArgv[]) {
