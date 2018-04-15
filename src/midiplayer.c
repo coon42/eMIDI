@@ -11,7 +11,7 @@ static Error reload(MidiPlayer* pPlayer) {
   if(error = eMidi_readEvent(&pPlayer->midi, &pPlayer->event))
     return error;
 
-  pPlayer->lastReloadTimeUs = eMidi_halTimeUs();
+  pPlayer->lastReloadTimeUs = eMidi_timeUs();
 
   return EMIDI_OK;
 }
@@ -64,7 +64,7 @@ Error eMidi_playerTick(MidiPlayer* pPlayer) {
 
   uint32_t tqpn = pPlayer->midi.header.division.tqpn.TQPN;
   uint32_t usToWait = (pPlayer->event.deltaTime * pPlayer->uspqn) / tqpn;
-  uint32_t usPassed = eMidi_halTimeUs() - pPlayer->lastReloadTimeUs;
+  uint32_t usPassed = eMidi_timeUs() - pPlayer->lastReloadTimeUs;
 
   if(usPassed < usToWait)
     return EMIDI_OK;

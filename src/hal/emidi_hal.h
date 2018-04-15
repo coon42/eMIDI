@@ -2,13 +2,13 @@
 #define EMIDI_HAL_H
 
 // Timing:
-int eMidi_halTimeUs();
+int eMidi_timeUs();
 
 // File access:
-FILE* eMidi_halFopen(const char* pPathName, const char* pMode);
-int eMidi_halFclose(FILE* pStream);
-long eMidi_halFtell(FILE* pStream);
-int eMidi_halFseek(FILE* pStream, long offset, int whence);
+FILE* eMidi_fopen(const char* pPathName, const char* pMode);
+int eMidi_fclose(FILE* pStream);
+long eMidi_ftell(FILE* pStream);
+int eMidi_fseek(FILE* pStream, long offset, int whence);
 
 #endif // EMIDI_HAL_H
 
