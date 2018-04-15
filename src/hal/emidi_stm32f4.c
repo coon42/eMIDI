@@ -25,3 +25,7 @@ int eMidi_fseek(FILE* pStream, long offset, int whence) {
   return 0; // TODO: implement
 }
 
+int eMidi_printf(const char* pFormat, ...) {
+  return 0; // TODO: implement
+}
+

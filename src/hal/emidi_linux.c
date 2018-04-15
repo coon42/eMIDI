@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 int eMidi_timeUs() {
   struct timespec t;
@@ -24,5 +25,14 @@ long eMidi_ftell(FILE* pStream) {
 
 int eMidi_fseek(FILE* pStream, long offset, int whence) {
   return fseek(pStream, offset, whence);
+}
+
+int eMidi_printf(const char* pFormat, ...) {
+  va_list args;
+  va_start(args, pFormat);
+
+  vprintf(pFormat, args);
+
+  va_end(args);
 }
 
