@@ -47,8 +47,8 @@ bin/dump: bin obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/dump.c
 bin/player: bin obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_linux.o utils/player.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_linux.o utils/player.c -o bin/player
 
-bin/memplayer: bin obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_memory.o utils/player.c
-	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_memory.o utils/player.c -o bin/memplayer
+bin/memplayer: bin obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_memory.o utils/player.c array.c
+	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_memory.o utils/player.c array.c -o bin/memplayer
 
 bin/gcode: bin obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/gcode.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/gcode.c -o bin/gcode
