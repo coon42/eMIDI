@@ -3,9 +3,9 @@ CXX = g++
 CFLAGS   = -std=c99
 CXXFLAGS = -std=c++17
 
-.PHONY: all clean test dump midiplayer player gcode
+.PHONY: all clean test dump midiplayer player memplayer gcode midi2array
 
-all: dump midiplayer player gcode midi2array
+all: dump midiplayer player memplayer gcode midi2array
 
 clean:
 	rm -rf obj
@@ -16,6 +16,7 @@ test: bin/tests
 
 dump: bin/dump
 player: bin/player
+memplayer: bin/memplayer
 gcode: bin/gcode
 midi2array: bin/midi2array
 
@@ -24,6 +25,9 @@ obj:
 
 bin:
 	mkdir bin
+
+obj/emidi_memory.o: obj src/hal/emidi_memory.c
+	$(CC) $(CFLAGS) -Isrc -c src/hal/emidi_memory.c -o obj/emidi_memory.o
 
 obj/emidi_linux.o: obj src/hal/emidi_linux.c
 	$(CC) $(CFLAGS) -Isrc -c src/hal/emidi_linux.c -o obj/emidi_linux.o
@@ -42,6 +46,9 @@ bin/dump: bin obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/dump.c
 
 bin/player: bin obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_linux.o utils/player.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_linux.o utils/player.c -o bin/player
+
+bin/memplayer: bin obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_memory.o utils/player.c
+	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_memory.o utils/player.c -o bin/memplayer
 
 bin/gcode: bin obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/gcode.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/gcode.c -o bin/gcode
