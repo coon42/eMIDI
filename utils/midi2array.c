@@ -31,8 +31,6 @@ static void writeArray(FILE* pMidiFile, FILE* pSourceFile) {
     if(i % 20 == 0) // limit text to about 100 columns
       writeStr(pSourceFile, "\n  ");
 
-    eMidi_fread(&b, 1, 1, pMidiFile);
-
     char pNum[32];
     snprintf(pNum, sizeof(pNum), "0x%02X,", (int)b);
 
