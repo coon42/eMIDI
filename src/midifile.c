@@ -126,7 +126,7 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   pMidiFile->size = fileSize;
   pMidiFile->header = header;
   pMidiFile->track.startPos = eMidi_ftell(p);
-  pMidiFile->track.pos = ftell(p);
+  pMidiFile->track.pos = eMidi_ftell(p);
   pMidiFile->track.len = chunkInfo.length;
   pMidiFile->prevEventId = 0;
 
