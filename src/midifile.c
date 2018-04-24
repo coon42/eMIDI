@@ -95,7 +95,9 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
     return EMIDI_INVALID_MIDI_FILE;
 
   MidiHeader header;
-  error = prvReadVoid(p, &header, chunkInfo.length, &numBytesRead);
+
+  if(error = error = prvReadVoid(p, &header, chunkInfo.length, &numBytesRead))
+    return error;
 
   header.format       = BSWAP_16(header.format);
   header.ntrks        = BSWAP_16(header.ntrks);
