@@ -4,3 +4,8 @@
     TODO: add detailed description here!
 */
 
+/*! \fn Error eMidi_open(MidiFile* pMidiFile, const char *pFileName)
+    \brief Opens a midi file.
+    \param pFileName File path of midi file.
+*/
+
