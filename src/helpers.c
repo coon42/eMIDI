@@ -1,5 +1,6 @@
 #include "midifile.h"
 #include "helpers.h"
+#include "hal/emidi_hal.h"
 
 const char* eMidi_errorToStr(Error error) {
   switch(error) {
@@ -494,13 +495,13 @@ static uint32_t prvUspqn2bpm(uint32_t uspqn) {
 
 static void printMidiNote(uint8_t channel, uint8_t midiNote, uint8_t velocity) {
   if(channel == 9)
-    printf(", Drum: %s (%d), Velocity: %d", eMidi_drumToStr(midiNote), midiNote, velocity);
+    eMidi_printf(", Drum: %s (%d), Velocity: %d", eMidi_drumToStr(midiNote), midiNote, velocity);
   else
-    printf(", Note: %s (%d), Velocity: %d", eMidi_numberToNote(midiNote), midiNote, velocity);
+    eMidi_printf(", Note: %s (%d), Velocity: %d", eMidi_numberToNote(midiNote), midiNote, velocity);
 }
 
 Error eMidi_printMidiEvent(const MidiEvent* e) {
-  printf("[0x%02X%s] %s", e->eventId, e->isRunningStatus ? " R" : "",
+  eMidi_printf("[0x%02X%s] %s", e->eventId, e->isRunningStatus ? " R" : "",
       eMidi_eventToStr(e->eventId));
 
   uint8_t channelNo      = e->eventId & 0x0F;
@@ -516,7 +517,7 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
       printMidiNote(channelNo, e->params.msg.noteOn.note, e->params.msg.noteOn.velocity);
 
       if(e->params.msg.noteOn.velocity == 0)
-        printf(" (Note-Off)");
+        eMidi_printf(" (Note-Off)");
 
       break;
 
@@ -524,12 +525,12 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
       break;
 
     case MIDI_EVENT_CONTROL_CHANGE:
-      printf(", Controller: %s (%d), value: %d", eMidi_controllerToStr(e->params.msg.controlChange.control),
+      eMidi_printf(", Controller: %s (%d), value: %d", eMidi_controllerToStr(e->params.msg.controlChange.control),
           e->params.msg.controlChange.control, e->params.msg.controlChange.value);
       break;
 
     case MIDI_EVENT_PROGRAM_CHANGE:
-      printf(", Program: '%s' (%d)", eMidi_programToStr(e->params.msg.programChange.programNumber),
+      eMidi_printf(", Program: '%s' (%d)", eMidi_programToStr(e->params.msg.programChange.programNumber),
           e->params.msg.programChange.programNumber);
 
       break;
@@ -538,20 +539,20 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
       break;
 
     case MIDI_EVENT_PITCH_BEND:
-      printf(", Value: %d", e->params.msg.pitchBend.value);
+      eMidi_printf(", Value: %d", e->params.msg.pitchBend.value);
       break;
   }
 
   if(e->eventId == MIDI_EVENT_META) {
-    printf(" - [0x%02x] %s ", e->metaEventId, eMidi_metaEventToStr(e->metaEventId));
+    eMidi_printf(" - [0x%02x] %s ", e->metaEventId, eMidi_metaEventToStr(e->metaEventId));
 
     switch(e->metaEventId) {
       case MIDI_SET_TEMPO:
-        printf("(%d bpm)", prvUspqn2bpm(e->params.msg.meta.setTempo.usPerQuarterNote));
+        eMidi_printf("(%d bpm)", prvUspqn2bpm(e->params.msg.meta.setTempo.usPerQuarterNote));
         break;
 
       case MIDI_META_MIDI_PORT:
-        printf("(port: %d)", e->params.msg.meta.midiPort.port);
+        eMidi_printf("(port: %d)", e->params.msg.meta.midiPort.port);
         break;
 
       default:
@@ -559,37 +560,37 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
     }
   }
 
-  printf("\n");
+  eMidi_printf("\n");
 
   return EMIDI_OK;
 }
 
 Error eMidi_printError(Error error) {
-  printf("Error %d: %s\n", error, eMidi_errorToStr(error));
+  eMidi_printf("Error %d: %s\n", error, eMidi_errorToStr(error));
 
   return EMIDI_OK;
 }
 
 Error eMidi_printFileInfo(const MidiFile* pMidiFile) {
-  printf("File size: %d bytes\n", pMidiFile->size);
-  printf("\n");
-  printf("MIDI header:\n");
-  printf("------------\n");
-  printf("File format: %d\n", pMidiFile->header.format);
-  printf("Number of tracks: %d\n", pMidiFile->header.ntrks);
-  printf("Division format: %s\n", pMidiFile->header.format == 0 ? "TPQN" : "SMPTE");
+  eMidi_printf("File size: %d bytes\n", pMidiFile->size);
+  eMidi_printf("\n");
+  eMidi_printf("MIDI header:\n");
+  eMidi_printf("------------\n");
+  eMidi_printf("File format: %d\n", pMidiFile->header.format);
+  eMidi_printf("Number of tracks: %d\n", pMidiFile->header.ntrks);
+  eMidi_printf("Division format: %s\n", pMidiFile->header.format == 0 ? "TPQN" : "SMPTE");
 
   switch(pMidiFile->header.division.format) {
     case DIVISION_TPQN:
-      printf("Ticks per quarter note: %d\n", pMidiFile->header.division.tqpn.TQPN);
+      eMidi_printf("Ticks per quarter note: %d\n", pMidiFile->header.division.tqpn.TQPN);
       break;
 
     case DIVISION_SMPTE:
-      printf("SMPTE format is not supported!\n");
+      eMidi_printf("SMPTE format is not supported!\n");
       break;
   }
 
-  printf("\n");
+  eMidi_printf("\n");
 
   return EMIDI_OK;
 }

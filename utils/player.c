@@ -51,6 +51,7 @@ typedef struct MyContext {
 
 static void userEventCallback(const MidiEvent* pEvent, void* pContext) {
   MyContext* pCtx = (MyContext*)pContext;
+  eMidi_printMidiEvent(pEvent);
 
   int numParamBytes = 0;
 
@@ -76,8 +77,6 @@ static void userEventCallback(const MidiEvent* pEvent, void* pContext) {
     packet[1] = pEvent->params.pRaw[i];
     write(pCtx->fd, packet, sizeof(packet));
   }
-
-  eMidi_printMidiEvent(pEvent);
 }
 
 int main(int argc, char* pArgv[]) {

@@ -4,4 +4,7 @@
 *.o
 *.nc
 bin
+doc/html
+doc/latex
+build
 

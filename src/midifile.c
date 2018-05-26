@@ -1,16 +1,17 @@
 #include <string.h>
 #include "midifile.h"
 #include "mybyteswap.h"
+#include "hal/emidi_hal.h"
 
 static Error prvSkipBytes(FILE* p, int len) {
-  if(fseek(p, len, SEEK_CUR))
+  if(eMidi_fseek(p, len, SEEK_CUR))
     return EMIDI_UNEXPECTED_END_OF_FILE;
 
   return EMIDI_OK;
 }
 
 static Error prvReadVoid(FILE* p, void* pOut, int len, int* pNumBytesRead) {
-  int n = fread(pOut, 1, len, p);
+  int n = eMidi_fread(pOut, 1, len, p);
 
   if(pNumBytesRead)
     *pNumBytesRead = n;
@@ -60,9 +61,9 @@ static Error prvReadVarLen(FILE* p, uint32_t* pLen) {
 }
 
 static uint32_t prvGetFileSize(FILE* p) {
-  fseek(p, 0, SEEK_END);
-  uint32_t fileSize = ftell(p);
-  fseek(p, 0, SEEK_SET);
+  eMidi_fseek(p, 0, SEEK_END);
+  uint32_t fileSize = eMidi_ftell(p);
+  eMidi_fseek(p, 0, SEEK_SET);
 
   return fileSize;
 }
@@ -71,7 +72,7 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(!pMidiFile)
     return EMIDI_INVALID_HANDLE;
 
-  FILE* p = fopen(pFileName, "rb");
+  FILE* p = eMidi_fopen(pFileName, "rb");
 
   if(!p)
     return EMIDI_CANNOT_OPEN_FILE;
@@ -94,7 +95,9 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
     return EMIDI_INVALID_MIDI_FILE;
 
   MidiHeader header;
-  error = prvReadVoid(p, &header, chunkInfo.length, &numBytesRead);
+
+  if(error = error = prvReadVoid(p, &header, chunkInfo.length, &numBytesRead))
+    return error;
 
   header.format       = BSWAP_16(header.format);
   header.ntrks        = BSWAP_16(header.ntrks);
@@ -124,8 +127,8 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   pMidiFile->p = p;
   pMidiFile->size = fileSize;
   pMidiFile->header = header;
-  pMidiFile->track.startPos = ftell(p);
-  pMidiFile->track.pos = ftell(p);
+  pMidiFile->track.startPos = eMidi_ftell(p);
+  pMidiFile->track.pos = eMidi_ftell(p);
   pMidiFile->track.len = chunkInfo.length;
   pMidiFile->prevEventId = 0;
 
@@ -137,7 +140,7 @@ Error eMidi_close(MidiFile* pMidiFile) {
     return EMIDI_INVALID_HANDLE;
 
   if (pMidiFile->p)
-    fclose(pMidiFile->p);
+    eMidi_fclose(pMidiFile->p);
 
   return EMIDI_OK;
 }
@@ -160,7 +163,7 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
     pEvent->eventId = pMidiFile->prevEventId;
 
     // TODO: do not read first data byte again. Skip second read instead:
-    fseek(pMidiFile->p, -1, SEEK_CUR);
+    eMidi_fseek(pMidiFile->p, -1, SEEK_CUR);
   }
 
   // First check for channel messages:
