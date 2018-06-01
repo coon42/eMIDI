@@ -1,7 +1,6 @@
 #ifndef _MIDIFILE_H
 #define _MIDIFILE_H
 
-#include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include "emiditypes.h"
@@ -157,22 +156,6 @@ enum MetaEvents {
   MIDI_TIME_SIGNATURE           = 0x58,
   MIDI_KEY_SIGNATURE            = 0x59,
   MIDI_SEQUENCER_SPECIFIC       = 0x7F
-};
-
-enum {
-  EMIDI_OK                     = 0x0000,
-  EMIDI_OK_END_OF_FILE         = 0x0001,
-
-  EMIDI_INVALID_HANDLE         = 0x1000,
-  EMIDI_CANNOT_OPEN_FILE       = 0x1001,
-  EMIDI_INVALID_MIDI_FILE      = 0x1002,
-  EMIDI_SYNTAX_ERROR           = 0x1003,
-  EMIDI_UNEXPECTED_END_OF_FILE = 0x1004,
-
-// remove as soon as supported:
-  EMIDI_FORMAT_1_NOT_SUPPORTED        = 0x2000,
-  EMIDI_FORMAT_2_NOT_SUPPORTED        = 0x2001,
-  EMIDI_DIVISION_FORMAT_NOT_SUPPORTED = 0x2002
 };
 
 Error eMidi_open(MidiFile* pMidiFile, const char* pFileName);
