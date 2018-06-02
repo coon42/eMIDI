@@ -46,6 +46,12 @@ Error eMidi_enumInPorts(uint32_t index, MidiPortInfo* pPortInfo) {
   return prvEnumPorts(index, pPortInfo, IN_PORT);
 }
 
+Error eMidi_openInPort(MidiInPort* pPort, uint32_t index) {
+  // TODO: implement
+
+  return EMIDI_OK;
+}
+
 Error eMidi_enumOutPorts(uint32_t index, MidiPortInfo* pPortInfo) {
   return prvEnumPorts(index, pPortInfo, OUT_PORT);
 }
