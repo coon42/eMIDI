@@ -1,4 +1,4 @@
-# eMIDI [![Build Status](https://travis-ci.org/coon42/eMIDI.svg?branch=master)](https://travis-ci.org/coon42/eMIDI) [![Coverage Status](https://coveralls.io/repos/github/coon42/eMIDI/badge.svg?branch=master)](https://coveralls.io/github/coon42/eMIDI?branch=master)
+# eMIDI [![Development stadium](https://img.shields.io/badge/stadium-pre--alpha-red.svg)](https://coveralls.io/repos/github/coon42/eMIDI/badge.svg?branch=master) [![Build Status](https://travis-ci.org/coon42/eMIDI.svg?branch=master)](https://travis-ci.org/coon42/eMIDI) [![Coverage Status](https://coveralls.io/repos/github/coon42/eMIDI/badge.svg?branch=master)](https://coveralls.io/github/coon42/eMIDI?branch=master)
 
 MIDI library optimized for beeing used on embedded devices
 
