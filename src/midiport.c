@@ -12,7 +12,7 @@ static Error prvEnumPorts(uint32_t index, MidiPortInfo* pPortInfo, PortType port
   int numDevs = portType == IN_PORT ? midiInGetNumDevs() : midiOutGetNumDevs();
 
   if (index >= numDevs)
-    return EMIDI_END_OF_PORTS;
+    return EMIDI_OK_END_OF_PORTS;
 
   MIDIINCAPS inCaps;
   MIDIOUTCAPS outCaps;
