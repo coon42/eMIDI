@@ -8,12 +8,16 @@ typedef struct MidiPortInfo {
   char pName[64];
 } MidiPortInfo;
 
+typedef void(*OnMidiMsgCallback_t)(void* pArgs);
+
 typedef struct MidiInPort {
   MidiPortInfo info;
+  OnMidiMsgCallback_t callback;
+  void* pCallbackArgs;
 } MidiInPort;
 
 Error eMidi_enumInPorts(uint32_t index, MidiPortInfo* pPortInfo);
+Error eMidi_openInPort(MidiInPort* pPort, uint32_t index, OnMidiMsgCallback_t callback, void* callbackArgs);
 Error eMidi_enumOutPorts(uint32_t index, MidiPortInfo* pPortInfo);
-Error eMidi_openInPort(MidiInPort* pPort, uint32_t index);
 
 #endif // !_MIDI_PORT

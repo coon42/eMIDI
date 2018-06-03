@@ -14,6 +14,8 @@ enum {
   EMIDI_SYNTAX_ERROR           = 0x1003,
   EMIDI_UNEXPECTED_END_OF_FILE = 0x1004,
 
+  EMIDI_INVALID_PORT_INDEX      = 0x1100,
+
   // remove as soon as supported:
   EMIDI_FORMAT_1_NOT_SUPPORTED        = 0x2000,
   EMIDI_FORMAT_2_NOT_SUPPORTED        = 0x2001,

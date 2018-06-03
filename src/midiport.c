@@ -42,12 +42,35 @@ static Error prvEnumPorts(uint32_t index, MidiPortInfo* pPortInfo, PortType port
   return EMIDI_OK;
 }
 
+static void CALLBACK midiInProc(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1,
+    DWORD_PTR dwParam2) {
+
+  MidiInPort* pPort = (MidiInPort*)dwInstance;
+
+  if(pPort->callback)
+    pPort->callback(pPort->pCallbackArgs);
+}
+
 Error eMidi_enumInPorts(uint32_t index, MidiPortInfo* pPortInfo) {
   return prvEnumPorts(index, pPortInfo, IN_PORT);
 }
 
-Error eMidi_openInPort(MidiInPort* pPort, uint32_t index) {
-  // TODO: implement
+Error eMidi_openInPort(MidiInPort* pPort, uint32_t index, OnMidiMsgCallback_t callback, void* pCallbackArgs) {
+  int numDevs = midiInGetNumDevs();
+
+  if (index < 0 || index > numDevs - 1)
+    return EMIDI_INVALID_PORT_INDEX;
+
+  pPort->info.id = index;
+  pPort->info.pName[0]; // TODO: set proper name
+  pPort->callback = callback;
+  pPort->pCallbackArgs = pCallbackArgs;
+
+  MMRESULT res;
+
+  HMIDIIN hMidiIn;
+  res = midiInOpen(&hMidiIn, index, (DWORD_PTR)midiInProc, (DWORD_PTR)pPort, CALLBACK_FUNCTION);
+  res = midiInStart(hMidiIn);
 
   return EMIDI_OK;
 }
