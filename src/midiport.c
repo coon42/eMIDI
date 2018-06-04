@@ -70,8 +70,9 @@ static void CALLBACK midiInProc(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance
     case MIM_DATA: 
       if (pPort->callback) {         
         const MM_MidiMsg_t* pMidiMsg = (const MM_MidiMsg_t*)&dwParam1;
+        uint32_t deltaTimeMs = (uint32_t)dwParam2;
 
-        pPort->callback(pPort->pCallbackArgs, pMidiMsg->status, pMidiMsg->param1, pMidiMsg->param2);
+        pPort->callback(pPort->pCallbackArgs, deltaTimeMs, pMidiMsg->status, pMidiMsg->param1, pMidiMsg->param2);
         break;
       }
   }

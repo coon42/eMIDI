@@ -9,7 +9,7 @@ typedef struct MidiPortInfo {
   char pName[64];
 } MidiPortInfo;
 
-typedef void(*OnMidiMsgCallback_t)(void* pArgs, uint8_t status, uint8_t param1, uint8_t param2);
+typedef void(*OnMidiMsgCallback_t)(void* pArgs, uint32_t deltaTimeMs, uint8_t status, uint8_t param1, uint8_t param2);
 
 typedef struct MidiInPort {
   HMIDIIN hMidiIn; // TODO: remove windows dependency!!!
