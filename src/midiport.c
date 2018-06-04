@@ -13,6 +13,11 @@ static Error getPortName(char* pPortName, int nCount, PortType portType, int ind
   MIDIOUTCAPS outCaps;
   const wchar_t* pName;
 
+  int numDevs = portType == IN_PORT ? midiInGetNumDevs() : midiOutGetNumDevs();
+
+  if (index >= numDevs)
+    return EMIDI_OK_END_OF_PORTS;
+
   if (portType == IN_PORT) {
     midiInGetDevCaps(index, &inCaps, sizeof(MIDIINCAPS));
     pName = inCaps.szPname;
@@ -31,6 +36,8 @@ static Error getPortName(char* pPortName, int nCount, PortType portType, int ind
 #else
   strncpy(pPortName, pName, nCount);
 #endif
+
+  return EMIDI_OK;
 }
 
 static Error prvEnumPorts(uint32_t index, MidiPortInfo* pPortInfo, PortType portType) {
@@ -86,11 +93,20 @@ Error eMidi_openInPort(MidiInPort* pPort, uint32_t index, OnMidiMsgCallback_t ca
   pPort->pCallbackArgs = pCallbackArgs;
 
   MMRESULT res;
+  
+  res = midiInOpen(&pPort->hMidiIn, index, (DWORD_PTR)midiInProc, (DWORD_PTR)pPort, CALLBACK_FUNCTION);
+  res = midiInStart(pPort->hMidiIn);
 
-  HMIDIIN hMidiIn;
-  res = midiInOpen(&hMidiIn, index, (DWORD_PTR)midiInProc, (DWORD_PTR)pPort, CALLBACK_FUNCTION);
-  res = midiInStart(hMidiIn);
+  return EMIDI_OK;
+}
 
+Error eMidi_closeInPort(MidiInPort* pPort) {
+  MMRESULT res;
+  
+  if (res = midiInClose(pPort->hMidiIn)) {
+    // TODO: return error
+  }
+        
   return EMIDI_OK;
 }
 
