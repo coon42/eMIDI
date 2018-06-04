@@ -8,12 +8,7 @@ typedef enum PortType {
   OUT_PORT
 } PortType;
 
-static Error prvEnumPorts(uint32_t index, MidiPortInfo* pPortInfo, PortType portType) {
-  int numDevs = portType == IN_PORT ? midiInGetNumDevs() : midiOutGetNumDevs();
-
-  if (index >= numDevs)
-    return EMIDI_OK_END_OF_PORTS;
-
+static Error getPortName(char* pPortName, int nCount, PortType portType, int index) {
   MIDIINCAPS inCaps;
   MIDIOUTCAPS outCaps;
   const wchar_t* pName;
@@ -27,28 +22,52 @@ static Error prvEnumPorts(uint32_t index, MidiPortInfo* pPortInfo, PortType port
     pName = outCaps.szPname;
   }
 
-  pPortInfo->id = index;
-
 #if defined(UNICODE) || defined( _UNICODE )
-  memset(pPortInfo->pName, 0, sizeof(pPortInfo->pName));
+  memset(pPortName, 0, nCount);
 
   int length = WideCharToMultiByte(CP_UTF8, 0, pName, -1, NULL, 0, NULL, NULL) - 1;
-  WideCharToMultiByte(CP_UTF8, 0, pName, (int)(wcslen(pName)), pPortInfo->pName, length, NULL, NULL);
-
+  length = length < nCount ? length : nCount;
+  WideCharToMultiByte(CP_UTF8, 0, pName, (int)(wcslen(pName)), pPortName, length, NULL, NULL);
 #else
-  strncpy(pPortInfo->pName, pName, sizeof(pPortInfo->pName));
+  strncpy(pPortName, pName, nCount);
 #endif
+}
+
+static Error prvEnumPorts(uint32_t index, MidiPortInfo* pPortInfo, PortType portType) {
+  int numDevs = portType == IN_PORT ? midiInGetNumDevs() : midiOutGetNumDevs();
+
+  if (index >= numDevs)
+    return EMIDI_OK_END_OF_PORTS;
+
+  pPortInfo->id = index;
+  getPortName(pPortInfo->pName, sizeof(pPortInfo->pName), portType, index);
 
   return EMIDI_OK;
 }
+
+typedef struct MM_MidiMsg_t {
+  uint8_t
+  status,
+  param1,
+  param2;
+} MM_MidiMsg_t;
 
 static void CALLBACK midiInProc(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1,
     DWORD_PTR dwParam2) {
 
   MidiInPort* pPort = (MidiInPort*)dwInstance;
 
-  if(pPort->callback)
-    pPort->callback(pPort->pCallbackArgs);
+  // TODO: sysex messages are not handled properly yet!
+
+  switch (wMsg) {    
+    case MIM_DATA: 
+      if (pPort->callback) {         
+        const MM_MidiMsg_t* pMidiMsg = (const MM_MidiMsg_t*)&dwParam1;
+
+        pPort->callback(pPort->pCallbackArgs, pMidiMsg->status, pMidiMsg->param1, pMidiMsg->param2);
+        break;
+      }
+  }
 }
 
 Error eMidi_enumInPorts(uint32_t index, MidiPortInfo* pPortInfo) {
@@ -62,7 +81,7 @@ Error eMidi_openInPort(MidiInPort* pPort, uint32_t index, OnMidiMsgCallback_t ca
     return EMIDI_INVALID_PORT_INDEX;
 
   pPort->info.id = index;
-  pPort->info.pName[0]; // TODO: set proper name
+  getPortName(pPort->info.pName, sizeof(pPort->info.pName), IN_PORT, index);  
   pPort->callback = callback;
   pPort->pCallbackArgs = pCallbackArgs;
 
