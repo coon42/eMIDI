@@ -16,7 +16,7 @@ int main(int argc, char* pArgv[]) {
 
   if(error = eMidi_close(&midi)) {
     eMidi_printError(error);
-    return error;
+    return 3;
   }
 
   return 0;
