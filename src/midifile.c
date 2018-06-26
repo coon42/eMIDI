@@ -282,7 +282,10 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
 //--------------------------------------------------------------------------------------------------
 
 Error eMidi_create(MidiFile* pMidiFile) {
-  return EMIDI_FUNCTION_NOT_IMPLEMENTED;
+  memset(pMidiFile, 0, sizeof(MidiFile));
+  pMidiFile->mode = MIDI_FILE_MODE_CREATE;
+
+  return EMIDI_OK;
 }
 
 Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
@@ -311,13 +314,26 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
 // Common
 //-------------------------------------------------------------------------------------------------
 
-Error eMidi_close(MidiFile* pMidiFile) {
-  if(!pMidiFile)
+static Error closeRead(MidiFile* pMidiFile) {
+  if (!pMidiFile)
     return EMIDI_INVALID_HANDLE;
 
   if (pMidiFile->p)
     eMidi_fclose(pMidiFile->p);
 
   return EMIDI_OK;
+}
+
+static Error closeCreate(MidiFile* pMidiFile) {
+  return EMIDI_OK;
+}
+
+Error eMidi_close(MidiFile* pMidiFile) {
+  switch(pMidiFile->mode) {
+    case MIDI_FILE_MODE_READ:   return closeRead(pMidiFile);
+    case MIDI_FILE_MODE_CREATE: return closeCreate(pMidiFile);
+  }
+
+  return EMIDI_INVALID_FILE_MODE;
 }
 
