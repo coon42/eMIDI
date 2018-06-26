@@ -8,6 +8,7 @@ const char* eMidi_errorToStr(Error error) {
     case EMIDI_OK_END_OF_FILE:           return "Ok, end of file";
     case EMIDI_INVALID_HANDLE:           return "Invalid Handle";
     case EMIDI_CANNOT_OPEN_FILE:         return "Cannot open file";
+    case EMIDI_INVALID_FILE_MODE:        return "Invalid file mode";
     case EMIDI_INVALID_MIDI_FILE:        return "Invalid MIDI file";
     case EMIDI_UNEXPECTED_END_OF_FILE:   return "Unexpected end of File";
     case EMIDI_CANNOT_WRITE_TO_FILE:     return "Cannot write to file";
