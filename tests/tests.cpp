@@ -105,3 +105,12 @@ TEST_CASE("eMidi_readEvent tests", "[open, readevent]") {
 
 }
 
+TEST_CASE("eMidi_create tests", "[create]") {
+  MidiFile midi;
+
+  SECTION("Create a MIDI file and directly close it again") {
+    REQUIRE(eMidi_create(&midi) == EMIDI_OK);
+    REQUIRE(eMidi_close(&midi) == EMIDI_OK);
+  }
+}
+
