@@ -46,8 +46,14 @@ typedef struct MidiTrack {
   int len;
 } MidiTrack;
 
+typedef enum MidiFileMode {
+  MIDI_FILE_MODE_READ,
+  MIDI_FILE_MODE_CREATE
+} MidiFileMode;
+
 typedef struct MidiFile {
   FILE* p;
+  MidiFileMode mode;
   uint32_t size;
   MidiHeader header;
   MidiTrack track;
