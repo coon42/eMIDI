@@ -286,7 +286,25 @@ Error eMidi_create(MidiFile* pMidiFile) {
 }
 
 Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
-  return EMIDI_FUNCTION_NOT_IMPLEMENTED;
+  if(!pMidiFile)
+    return EMIDI_INVALID_HANDLE;
+
+  FILE* p = eMidi_fopen(pFileName, "wb");
+
+  if(!p)
+    return EMIDI_CANNOT_OPEN_FILE;
+
+  const char* pData = "TODO: write MIDI data here!\n";
+
+  if(!eMidi_fwrite(pData, strlen(pData), 1, p))
+    return EMIDI_CANNOT_WRITE_TO_FILE;
+
+  Error error;
+
+  if(error = eMidi_close(pMidiFile))
+    return error;
+
+  return EMIDI_OK;
 }
 
 //--------------------------------------------------------------------------------------------------
