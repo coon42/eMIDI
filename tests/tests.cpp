@@ -6,6 +6,9 @@ extern "C" {
   #include "../src/midifile.h"
 }
 
+// TODO: try to use API function on a file with wrong mode
+//       e.g. eMidi_create() followed by eMidi_readEvent()
+
 TEST_CASE("eMidi_open tests", "[open]") {
   SECTION("providing NULL for pMidiFile and NULL for pFileName") {
     REQUIRE(eMidi_open(NULL, NULL) == EMIDI_INVALID_HANDLE);
