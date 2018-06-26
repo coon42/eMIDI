@@ -10,6 +10,7 @@ const char* eMidi_errorToStr(Error error) {
     case EMIDI_CANNOT_OPEN_FILE:         return "Cannot open file";
     case EMIDI_INVALID_MIDI_FILE:        return "Invalid MIDI file";
     case EMIDI_UNEXPECTED_END_OF_FILE:   return "Unexpected end of File";
+    case EMIDI_CANNOT_WRITE_TO_FILE:     return "Cannot write to file";
     case EMIDI_SYNTAX_ERROR:             return "Syntax Error";
     case EMIDI_FUNCTION_NOT_IMPLEMENTED: return "Function not implemented";
     case EMIDI_FORMAT_1_NOT_SUPPORTED:   return "Format 1 not supported";
