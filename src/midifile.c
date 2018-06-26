@@ -81,6 +81,8 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(!p)
     return EMIDI_CANNOT_OPEN_FILE;
 
+  pMidiFile->mode = MIDI_FILE_MODE_READ;
+
   uint32_t fileSize = prvGetFileSize(p);
 
   MidiChunkInfo chunkInfo;
