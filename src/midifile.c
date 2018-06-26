@@ -144,6 +144,12 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
 Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
   Error error;
 
+  if(!pMidiFile)
+    return EMIDI_INVALID_HANDLE;
+
+  if(pMidiFile->mode != MIDI_FILE_MODE_READ)
+    return EMIDI_INVALID_FILE_MODE;
+
   if(error = prvReadVarLen(pMidiFile->p, &pEvent->deltaTime))
     return error;
 
@@ -278,7 +284,6 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
   return EMIDI_OK;
 }
 
-
 //--------------------------------------------------------------------------------------------------
 // Write-API
 //--------------------------------------------------------------------------------------------------
@@ -293,6 +298,9 @@ Error eMidi_create(MidiFile* pMidiFile) {
 Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
   if(!pMidiFile)
     return EMIDI_INVALID_HANDLE;
+
+  if(pMidiFile->mode != MIDI_FILE_MODE_CREATE)
+    return EMIDI_INVALID_FILE_MODE;
 
   FILE* p = eMidi_fopen(pFileName, "wb");
 
