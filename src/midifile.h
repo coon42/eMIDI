@@ -163,8 +163,8 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName);
 Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent);
 
 // Write-API:
-Error eMidi_create(MidiFile* pMidiFile, const char* pFileName);
-Error eMidi_save(MidiFile* pMidiFile);
+Error eMidi_create(MidiFile* pMidiFile);
+Error eMidi_save(MidiFile* pMidiFile, const char* pFileName);
 
 // Common:
 Error eMidi_close(MidiFile* pMidiFile);

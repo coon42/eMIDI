@@ -279,16 +279,15 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
 
 //--------------------------------------------------------------------------------------------------
 // Write-API
-//-------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
-Error eMidi_create(MidiFile* pMidiFile, const char* pFileName) {
+Error eMidi_create(MidiFile* pMidiFile) {
   return EMIDI_FUNCTION_NOT_IMPLEMENTED;
 }
 
-Error eMidi_save(MidiFile* pMidiFile) {
+Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
   return EMIDI_FUNCTION_NOT_IMPLEMENTED;
 }
-
 
 //--------------------------------------------------------------------------------------------------
 // Common
