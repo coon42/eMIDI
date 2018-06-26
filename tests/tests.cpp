@@ -17,16 +17,23 @@ TEST_CASE("eMidi_open tests", "[open]") {
     REQUIRE(eMidi_open(&midi, NULL) == EMIDI_CANNOT_OPEN_FILE);
   }
 
-  SECTION("providing valid object for pMidiFile and file name of invalid MIDI File") {
+  SECTION("providing valid object for pMidiFile and file name of invalid MIDI file") {
     MidiFile midi;
 
     REQUIRE(eMidi_open(&midi, "midis/invalid.mid") == EMIDI_INVALID_MIDI_FILE);
   }
 
-  SECTION("providing valid object for pMidiFile and file name of valid MIDI 0 File") {
+  SECTION("providing valid object for pMidiFile and file name of valid MIDI 0 file") {
     MidiFile midi;
 
     REQUIRE(eMidi_open(&midi, "midis/c4_0.mid") == EMIDI_OK);
+  }
+
+  SECTION("open valid MIDI 0 file and check for correct file mode") {
+    MidiFile midi;
+
+    REQUIRE(eMidi_open(&midi, "midis/c4_0.mid") == EMIDI_OK);
+    REQUIRE(midi.mode == MIDI_FILE_MODE_READ);
   }
 
   SECTION("Complete parsing of cdefgabc_0.mid without any error") {
@@ -110,6 +117,7 @@ TEST_CASE("eMidi_create tests", "[create]") {
 
   SECTION("Create a MIDI file and directly close it again") {
     REQUIRE(eMidi_create(&midi) == EMIDI_OK);
+    REQUIRE(midi.mode == MIDI_FILE_MODE_CREATE);
     REQUIRE(eMidi_close(&midi) == EMIDI_OK);
   }
 }
