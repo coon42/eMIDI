@@ -3,9 +3,9 @@ CXX = g++
 CFLAGS   = -std=c99
 CXXFLAGS = -std=c++17
 
-.PHONY: all clean test dump midiplayer player memplayer gcode midi2array
+.PHONY: all clean test dump midiplayer player memplayer gcode midi2array create
 
-all: dump midiplayer player memplayer gcode midi2array
+all: dump midiplayer player memplayer gcode midi2array create
 
 clean:
 	rm -rf obj
@@ -19,6 +19,7 @@ player: bin/player
 memplayer: bin/memplayer
 gcode: bin/gcode
 midi2array: bin/midi2array
+create: bin/create
 
 obj:
 	mkdir obj
@@ -55,6 +56,9 @@ bin/gcode: bin obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/gcode.c
 
 bin/midi2array: bin obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/midi2array.c
 	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/midi2array.c -o bin/midi2array
+
+bin/create: bin obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/create.c
+	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/create.c -o bin/create
 
 bin/tests: bin obj/midifile.o obj/emidi_linux.o tests/tests.cpp
 	$(CXX) $(CXXFLAGS) obj/midifile.o obj/emidi_linux.o tests/tests.cpp -o bin/tests
