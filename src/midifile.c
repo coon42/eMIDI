@@ -68,6 +68,10 @@ static uint32_t prvGetFileSize(FILE* p) {
   return fileSize;
 }
 
+//--------------------------------------------------------------------------------------------------
+// Read-API
+//-------------------------------------------------------------------------------------------------
+
 Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(!pMidiFile)
     return EMIDI_INVALID_HANDLE;
@@ -131,16 +135,6 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   pMidiFile->track.pos = eMidi_ftell(p);
   pMidiFile->track.len = chunkInfo.length;
   pMidiFile->prevEventId = 0;
-
-  return EMIDI_OK;
-}
-
-Error eMidi_close(MidiFile* pMidiFile) {
-  if(!pMidiFile)
-    return EMIDI_INVALID_HANDLE;
-
-  if (pMidiFile->p)
-    eMidi_fclose(pMidiFile->p);
 
   return EMIDI_OK;
 }
@@ -278,6 +272,34 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
     default:
       return EMIDI_SYNTAX_ERROR;
   }
+
+  return EMIDI_OK;
+}
+
+
+//--------------------------------------------------------------------------------------------------
+// Write-API
+//-------------------------------------------------------------------------------------------------
+
+Error eMidi_create(MidiFile* pMidiFile, const char* pFileName) {
+  return EMIDI_FUNCTION_NOT_IMPLEMENTED;
+}
+
+Error eMidi_save(MidiFile* pMidiFile) {
+  return EMIDI_FUNCTION_NOT_IMPLEMENTED;
+}
+
+
+//--------------------------------------------------------------------------------------------------
+// Common
+//-------------------------------------------------------------------------------------------------
+
+Error eMidi_close(MidiFile* pMidiFile) {
+  if(!pMidiFile)
+    return EMIDI_INVALID_HANDLE;
+
+  if (pMidiFile->p)
+    eMidi_fclose(pMidiFile->p);
 
   return EMIDI_OK;
 }
