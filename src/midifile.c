@@ -360,12 +360,22 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
   if(!p)
     return EMIDI_CANNOT_OPEN_FILE;
 
-  const char* pData = "TODO: write MIDI data here!\n";
-
-  if(!eMidi_fwrite(pData, strlen(pData), 1, p))
-    return EMIDI_CANNOT_WRITE_TO_FILE;
-
   Error error;
+
+  MidiChunkInfo chunkInfo;
+  memcpy(chunkInfo.pChunk, "MThd", 4);
+  chunkInfo.length = BSWAP_32(6);
+
+  if(error = error = prvWriteVoid(p, &chunkInfo, sizeof(MidiChunkInfo)))
+    return error;
+
+  MidiHeader header;
+  header.format       = BSWAP_16(0);
+  header.ntrks        = BSWAP_16(1);
+  header.division.raw = BSWAP_16(42); // TODO: find out default value
+
+  if(error = error = prvWriteVoid(p, &header, sizeof(MidiHeader)))
+    return error;
 
   if(error = eMidi_close(pMidiFile))
     return error;
