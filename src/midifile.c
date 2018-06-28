@@ -27,11 +27,11 @@ static Error prvReadByte(FILE* p, uint8_t* pOut, int* pNumBytesRead) {
 }
 
 static Error prvReadWord(FILE* p, uint16_t* pOut, int* pNumBytesRead) {
-  return prvReadVoid(p, pOut, sizeof(uint16_t*), pNumBytesRead);
+  return prvReadVoid(p, pOut, sizeof(uint16_t), pNumBytesRead);
 }
 
 static Error prvReadDword(FILE* p, uint32_t* pOut, int* pNumBytesRead) {
-  return prvReadVoid(p, pOut, sizeof(uint32_t*), pNumBytesRead);
+  return prvReadVoid(p, pOut, sizeof(uint32_t), pNumBytesRead);
 }
 
 static Error prvReadVarLen(FILE* p, uint32_t* pLen) {
@@ -59,6 +59,59 @@ static Error prvReadVarLen(FILE* p, uint32_t* pLen) {
 
   return EMIDI_OK;
 }
+
+// --
+
+static Error prvWriteVoid(FILE* p, const void* pData, int len) {
+  int n = eMidi_fwrite(pData, 1, len, p);
+
+  if(n < len)
+    return EMIDI_UNEXPECTED_END_OF_FILE;
+
+  return EMIDI_OK;
+}
+
+static Error prvWriteByte(FILE* p, const uint8_t* pData) {
+  return prvWriteVoid(p, pData, sizeof(uint8_t));
+}
+
+static Error prvWriteWord(FILE* p, const uint16_t* pData) {
+  return prvWriteVoid(p, pData, sizeof(uint16_t));
+}
+
+static Error prvWriteDword(FILE* p, const uint32_t* pData) {
+  return prvWriteVoid(p, pData, sizeof(uint32_t));
+}
+
+static Error prvWriteVarLen(FILE* p, const uint32_t* pData) {
+  /*
+  Error error;
+  uint32_t value;
+  uint8_t c;
+
+  if(error = prvReadByte(p, &c, NULL))
+    return error;
+
+  value = c;
+
+  if(c & 0x80) {
+    value &= 0x7f;
+
+    do {
+      if(error = prvReadByte(p, &c, NULL))
+        return error;
+
+      value = (value << 7) + (c & 0x7f);
+    } while (c & 0x80);
+  }
+
+  *pData = value;
+  */
+
+  return EMIDI_OK;
+}
+
+// --
 
 static uint32_t prvGetFileSize(FILE* p) {
   eMidi_fseek(p, 0, SEEK_END);
