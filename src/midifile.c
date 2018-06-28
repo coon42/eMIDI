@@ -377,6 +377,12 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
   if(error = error = prvWriteVoid(p, &header, sizeof(MidiHeader)))
     return error;
 
+  memcpy(chunkInfo.pChunk, "MTrk", 4);
+  chunkInfo.length = BSWAP_32(0); // TOOD: put correct track length here!
+
+  if(error = prvWriteVoid(p, &chunkInfo, sizeof(MidiChunkInfo)))
+    return error;
+
   if(error = eMidi_close(pMidiFile))
     return error;
 
