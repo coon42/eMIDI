@@ -60,13 +60,11 @@ static Error prvReadVarLen(FILE* p, uint32_t* pLen) {
   return EMIDI_OK;
 }
 
-// --
-
 static Error prvWriteVoid(FILE* p, const void* pData, int len) {
   int n = eMidi_fwrite(pData, 1, len, p);
 
   if(n < len)
-    return EMIDI_UNEXPECTED_END_OF_FILE;
+    return EMIDI_CANNOT_WRITE_TO_FILE;
 
   return EMIDI_OK;
 }
@@ -83,35 +81,31 @@ static Error prvWriteDword(FILE* p, const uint32_t* pData) {
   return prvWriteVoid(p, pData, sizeof(uint32_t));
 }
 
-static Error prvWriteVarLen(FILE* p, const uint32_t* pData) {
-  /*
-  Error error;
-  uint32_t value;
-  uint8_t c;
+// TODO: test this function:
+static Error prvWriteVarLen(FILE* p, uint32_t value) {
+  uint32_t buffer = value & 0x7f;
 
-  if(error = prvReadByte(p, &c, NULL))
-    return error;
-
-  value = c;
-
-  if(c & 0x80) {
-    value &= 0x7f;
-
-    do {
-      if(error = prvReadByte(p, &c, NULL))
-        return error;
-
-      value = (value << 7) + (c & 0x7f);
-    } while (c & 0x80);
+  while ((value >>= 7) > 0) {
+    buffer <<= 8;
+    buffer |= 0x80;
+    buffer += (value & 0x7f);
   }
 
-  *pData = value;
-  */
+  Error error;
+
+  while (true) {
+    uint8_t c = (uint8_t)buffer;
+    if(error = prvWriteByte(p, &c))
+      return error;
+
+    if (buffer & 0x80)
+      buffer >>= 8;
+    else
+      break;
+  }
 
   return EMIDI_OK;
 }
-
-// --
 
 static uint32_t prvGetFileSize(FILE* p) {
   eMidi_fseek(p, 0, SEEK_END);
@@ -346,6 +340,10 @@ Error eMidi_create(MidiFile* pMidiFile) {
   pMidiFile->mode = MIDI_FILE_MODE_CREATE;
 
   return EMIDI_OK;
+}
+
+Error eMidi_writeEvent(MidiFile* pMidiFile, const MidiEvent* pEvent) {
+  return EMIDI_FUNCTION_NOT_IMPLEMENTED;
 }
 
 Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
