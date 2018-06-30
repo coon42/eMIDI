@@ -69,19 +69,18 @@ static Error prvWriteVoid(FILE* p, const void* pData, int len) {
   return EMIDI_OK;
 }
 
-static Error prvWriteByte(FILE* p, const uint8_t* pData) {
-  return prvWriteVoid(p, pData, sizeof(uint8_t));
+static Error prvWriteByte(FILE* p, uint8_t data) {
+  return prvWriteVoid(p, &data, sizeof(uint8_t));
 }
 
-static Error prvWriteWord(FILE* p, const uint16_t* pData) {
-  return prvWriteVoid(p, pData, sizeof(uint16_t));
+static Error prvWriteWord(FILE* p, uint16_t data) {
+  return prvWriteVoid(p, &data, sizeof(uint16_t));
 }
 
-static Error prvWriteDword(FILE* p, const uint32_t* pData) {
-  return prvWriteVoid(p, pData, sizeof(uint32_t));
+static Error prvWriteDword(FILE* p, uint32_t data) {
+  return prvWriteVoid(p, &data, sizeof(uint32_t));
 }
 
-// TODO: test this function:
 static Error prvWriteVarLen(FILE* p, uint32_t value) {
   uint32_t buffer = value & 0x7f;
 
@@ -95,7 +94,8 @@ static Error prvWriteVarLen(FILE* p, uint32_t value) {
 
   while (true) {
     uint8_t c = (uint8_t)buffer;
-    if(error = prvWriteByte(p, &c))
+
+    if(error = prvWriteByte(p, c))
       return error;
 
     if (buffer & 0x80)
@@ -343,7 +343,19 @@ Error eMidi_create(MidiFile* pMidiFile) {
 }
 
 Error eMidi_writeEvent(MidiFile* pMidiFile, const MidiEvent* pEvent) {
-  return EMIDI_FUNCTION_NOT_IMPLEMENTED;
+  Error error;
+
+  if(error = prvWriteVarLen(pMidiFile->p, pEvent->deltaTime))
+    return error;
+
+  if(error = prvWriteByte(pMidiFile->p, pEvent->eventId))
+    return error;
+
+  // TODO: use correct midi param len instead of hard coding 2!
+  if(error = error = prvWriteVoid(pMidiFile->p, &pEvent->params.msg, 2))
+    return error;
+
+  return EMIDI_OK;
 }
 
 Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
@@ -354,6 +366,7 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
     return EMIDI_INVALID_FILE_MODE;
 
   FILE* p = eMidi_fopen(pFileName, "wb");
+  pMidiFile->p = p;
 
   if(!p)
     return EMIDI_CANNOT_OPEN_FILE;
@@ -376,9 +389,18 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
     return error;
 
   memcpy(chunkInfo.pChunk, "MTrk", 4);
-  chunkInfo.length = BSWAP_32(0); // TOOD: put correct track length here!
+  chunkInfo.length = BSWAP_32(4); // TOOD: put correct track length here!
 
   if(error = prvWriteVoid(p, &chunkInfo, sizeof(MidiChunkInfo)))
+    return error;
+
+  MidiEvent e = { 0 };
+  e.deltaTime = 0;
+  e.eventId = MIDI_EVENT_NOTE_ON;
+  e.params.msg.noteOn.note = 48;
+  e.params.msg.noteOn.velocity = 64;
+
+  if(error = eMidi_writeEvent(pMidiFile, &e))
     return error;
 
   if(error = eMidi_close(pMidiFile))
