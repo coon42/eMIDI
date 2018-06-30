@@ -9,7 +9,19 @@ int main(int argc, char* pArgv[]) {
     return 1;
   }
 
-  if(error = eMidi_writeNoteOnEvent(&midi, 0, 0, 48, 64))
+  if (error = eMidi_writeSetTempoMetaEvent(&midi, 0, 400))
+    return error;
+
+  if (error = eMidi_writeNoteOnEvent(&midi, 0, 0, 48, 127))
+    return error;
+
+  if (error = eMidi_writeNoteOnEvent(&midi, 960, 0, 64, 127))
+    return error;
+
+  if (error = eMidi_writeNoteOnEvent(&midi, 960, 0, 96, 127))
+    return error;
+
+  if (error = eMidi_writeNoteOnEvent(&midi, 960, 0, 48, 0))
     return error;
 
   if (error = eMidi_save(&midi, "example.mid")) {
