@@ -397,7 +397,7 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
   MidiHeader header;
   header.format       = BSWAP_16(0);
   header.ntrks        = BSWAP_16(1);
-  header.division.raw = BSWAP_16(960); // TODO: find out default value
+  header.division.raw = BSWAP_16(960); // TODO: Make division configurable by user
 
   if(error = error = prvWriteVoid(p, &header, sizeof(MidiHeader)))
     return error;
@@ -422,19 +422,6 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
       return error;
   }
 
-/*
-  e.deltaTime = 2 * 960;
-  e.eventId = MIDI_EVENT_NOTE_OFF;
-  e.params.msg.noteOn.note = 48;
-  e.params.msg.noteOn.velocity = 64;
-
-  if(error = eMidi_writeEvent(pMidiFile, &e))
-    return error;
-*/
-
-  if(error = eMidi_close(pMidiFile))
-    return error;
-
   return EMIDI_OK;
 }
 
@@ -453,7 +440,14 @@ static Error closeRead(MidiFile* pMidiFile) {
 }
 
 static Error closeCreate(MidiFile* pMidiFile) {
-  // TODO: free event list
+  MidiEventList* p = pMidiFile->pEventList;
+
+  while(p) {
+    MidiEventList* pNext = p->pNext;
+    free(p);
+
+    p = pNext;
+  }
 
   return EMIDI_OK;
 }
