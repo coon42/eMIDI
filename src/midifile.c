@@ -118,7 +118,7 @@ static uint32_t prvGetFileSize(FILE* p) {
 
 //--------------------------------------------------------------------------------------------------
 // Read-API
-//-------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   if(!pMidiFile)
@@ -372,6 +372,19 @@ Error eMidi_writeNoteOnEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t ch
   return writeEvent(pMidiFile, &e);
 }
 
+Error eMidi_writeSetTempoMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint32_t bpm) {
+  static const uint32_t c = 60000000;
+
+  MidiEvent e = { 0 };
+  e.deltaTime = deltaTime;
+  e.eventId = MIDI_EVENT_META;
+  e.metaEventId = MIDI_SET_TEMPO;
+  e.metaEventLen = 3;
+  e.params.msg.meta.setTempo.usPerQuarterNote = c / bpm;
+
+  return writeEvent(pMidiFile, &e);
+}
+
 Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
   if(!pMidiFile)
     return EMIDI_INVALID_HANDLE;
@@ -417,9 +430,27 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
     if(error = prvWriteByte(pMidiFile->p, e.eventId))
       return error;
 
-    // TODO: use correct midi param len instead of hard coding 2!
-    if(error = error = prvWriteVoid(pMidiFile->p, &e.params.msg, 2))
-      return error;
+    if(e.eventId != MIDI_EVENT_META) {
+      // TODO: use correct midi param len instead of hard coding 2!
+      if(error = error = prvWriteVoid(pMidiFile->p, &e.params.msg, 2))
+        return error;
+    }
+    else {
+      if(error = prvWriteByte(pMidiFile->p, e.metaEventId))
+        return error;
+
+      if(error = prvWriteByte(pMidiFile->p, e.metaEventLen))
+        return error;
+
+      switch(e.metaEventId) {
+        case MIDI_SET_TEMPO:
+          e.params.msg.meta.setTempo.usPerQuarterNote = BSWAP_32(e.params.msg.meta.setTempo.usPerQuarterNote) >> 8;
+          break;
+      }
+
+      if(error = error = prvWriteVoid(pMidiFile->p, &e.params.msg, e.metaEventLen))
+        return error;
+    }
   }
 
   return EMIDI_OK;
