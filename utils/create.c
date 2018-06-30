@@ -9,6 +9,9 @@ int main(int argc, char* pArgv[]) {
     return 1;
   }
 
+  if(error = eMidi_writeNoteOnEvent(&midi, 0, 0, 48, 64))
+    return error;
+
   if (error = eMidi_save(&midi, "example.mid")) {
     eMidi_printError(error);
     return 2;

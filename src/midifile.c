@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 #include "midifile.h"
 #include "mybyteswap.h"
 #include "hal/emidi_hal.h"
@@ -342,20 +343,26 @@ Error eMidi_create(MidiFile* pMidiFile) {
   return EMIDI_OK;
 }
 
-Error eMidi_writeEvent(MidiFile* pMidiFile, const MidiEvent* pEvent) {
-  Error error;
+static Error writeEvent(MidiFile* pMidiFile, const MidiEvent* pEvent) {
+  MidiEventList* pList = (MidiEventList*)malloc(sizeof(MidiEventList));
+  pList->event = *pEvent;
 
-  if(error = prvWriteVarLen(pMidiFile->p, pEvent->deltaTime))
-    return error;
-
-  if(error = prvWriteByte(pMidiFile->p, pEvent->eventId))
-    return error;
-
-  // TODO: use correct midi param len instead of hard coding 2!
-  if(error = error = prvWriteVoid(pMidiFile->p, &pEvent->params.msg, 2))
-    return error;
+  if(pMidiFile->pEventList)
+    pMidiFile->pEventList->pNext = pList;
+  else
+    pMidiFile->pEventList = pList;
 
   return EMIDI_OK;
+}
+
+Error eMidi_writeNoteOnEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t note, uint8_t velocity) {
+  MidiEvent e = { 0 };
+  e.deltaTime = deltaTime;
+  e.eventId = MIDI_EVENT_NOTE_ON;
+  e.params.msg.noteOn.note = note;
+  e.params.msg.noteOn.velocity = velocity;
+
+  return writeEvent(pMidiFile, &e);
 }
 
 Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
@@ -394,15 +401,21 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
   if(error = prvWriteVoid(p, &chunkInfo, sizeof(MidiChunkInfo)))
     return error;
 
-  MidiEvent e = { 0 };
-  e.deltaTime = 0;
-  e.eventId = MIDI_EVENT_NOTE_ON;
-  e.params.msg.noteOn.note = 48;
-  e.params.msg.noteOn.velocity = 64;
+  for(const MidiEventList* pList = pMidiFile->pEventList; pList; pList = pList->pNext) {
+    MidiEvent e = pList->event;
 
-  if(error = eMidi_writeEvent(pMidiFile, &e))
-    return error;
+    if(error = prvWriteVarLen(pMidiFile->p, e.deltaTime))
+      return error;
 
+    if(error = prvWriteByte(pMidiFile->p, e.eventId))
+      return error;
+
+    // TODO: use correct midi param len instead of hard coding 2!
+    if(error = error = prvWriteVoid(pMidiFile->p, &e.params.msg, 2))
+      return error;
+  }
+
+/*
   e.deltaTime = 2 * 960;
   e.eventId = MIDI_EVENT_NOTE_OFF;
   e.params.msg.noteOn.note = 48;
@@ -410,6 +423,7 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
 
   if(error = eMidi_writeEvent(pMidiFile, &e))
     return error;
+*/
 
   if(error = eMidi_close(pMidiFile))
     return error;
@@ -432,6 +446,8 @@ static Error closeRead(MidiFile* pMidiFile) {
 }
 
 static Error closeCreate(MidiFile* pMidiFile) {
+  // TODO: free event list
+
   return EMIDI_OK;
 }
 

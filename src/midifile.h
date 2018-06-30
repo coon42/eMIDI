@@ -51,15 +51,6 @@ typedef enum MidiFileMode {
   MIDI_FILE_MODE_CREATE
 } MidiFileMode;
 
-typedef struct MidiFile {
-  FILE* p;
-  MidiFileMode mode;
-  uint32_t size;
-  MidiHeader header;
-  MidiTrack track;
-  uint8_t prevEventId;
-} MidiFile;
-
 typedef struct MidiStatusParams {
   uint8_t pRaw[2];
 
@@ -108,6 +99,25 @@ typedef struct MidiEvent {
   MidiStatusParams params;
   bool isRunningStatus;
 } MidiEvent;
+
+typedef struct MidiEventList {
+  MidiEvent event;
+  struct MidiEventList* pNext;
+} MidiEventList;
+
+typedef struct MidiFile {
+  FILE* p;
+  MidiFileMode mode;
+  MidiHeader header;
+
+  // Only used in read mode:
+  uint32_t size;
+  MidiTrack track;
+  uint8_t prevEventId;
+
+  // Only used in write mode:
+  MidiEventList* pEventList;
+} MidiFile;
 
 enum MidiVoiceMessages {
   MIDI_EVENT_NOTE_OFF          = 0x80,
@@ -170,6 +180,7 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent);
 
 // Write-API:
 Error eMidi_create(MidiFile* pMidiFile);
+Error eMidi_writeNoteOnEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t note, uint8_t velocity);
 Error eMidi_save(MidiFile* pMidiFile, const char* pFileName);
 
 // Common:
