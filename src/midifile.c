@@ -383,7 +383,7 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
   MidiHeader header;
   header.format       = BSWAP_16(0);
   header.ntrks        = BSWAP_16(1);
-  header.division.raw = BSWAP_16(42); // TODO: find out default value
+  header.division.raw = BSWAP_16(960); // TODO: find out default value
 
   if(error = error = prvWriteVoid(p, &header, sizeof(MidiHeader)))
     return error;
@@ -397,6 +397,14 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
   MidiEvent e = { 0 };
   e.deltaTime = 0;
   e.eventId = MIDI_EVENT_NOTE_ON;
+  e.params.msg.noteOn.note = 48;
+  e.params.msg.noteOn.velocity = 64;
+
+  if(error = eMidi_writeEvent(pMidiFile, &e))
+    return error;
+
+  e.deltaTime = 2 * 960;
+  e.eventId = MIDI_EVENT_NOTE_OFF;
   e.params.msg.noteOn.note = 48;
   e.params.msg.noteOn.velocity = 64;
 
