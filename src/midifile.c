@@ -346,9 +346,16 @@ Error eMidi_create(MidiFile* pMidiFile) {
 static Error writeEvent(MidiFile* pMidiFile, const MidiEvent* pEvent) {
   MidiEventList* pList = (MidiEventList*)malloc(sizeof(MidiEventList));
   pList->event = *pEvent;
+  pList->pNext = NULL;
 
-  if(pMidiFile->pEventList)
-    pMidiFile->pEventList->pNext = pList;
+  if(pMidiFile->pEventList) {
+    MidiEventList* pLast;
+
+    for(pLast = pMidiFile->pEventList; pLast->pNext; pLast = pLast->pNext)
+      ; // Seek to end of list. TODO: save pointer to last entry somewhere instead of seeking
+
+    pLast->pNext = pList;
+  }
   else
     pMidiFile->pEventList = pList;
 
