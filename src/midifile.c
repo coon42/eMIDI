@@ -401,6 +401,16 @@ Error eMidi_writeProgramChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uin
   return writeEvent(pMidiFile, &e);
 }
 
+Error eMidi_writeEndOfTrackMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime) {
+  MidiEvent e = { 0 };
+  e.deltaTime = deltaTime;
+  e.eventId = MIDI_EVENT_META;
+  e.metaEventId = MIDI_END_OF_TRACK;
+  e.metaEventLen = 0;
+
+  return writeEvent(pMidiFile, &e);
+}
+
 Error eMidi_writeSetTempoMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint32_t bpm) {
   static const uint32_t c = 60000000;
 
@@ -498,7 +508,7 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
         case MIDI_EVENT_PITCH_BEND:        paramLen = 2; break;
       }
 
-      if(error = error = prvWriteVoid(pMidiFile->p, &e.params.msg, paramLen))
+      if(error = prvWriteVoid(pMidiFile->p, &e.params.msg, paramLen))
         return error;
     }
     else {
@@ -514,8 +524,10 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
           break;
       }
 
-      if(error = error = prvWriteVoid(pMidiFile->p, &e.params.msg, e.metaEventLen))
-        return error;
+      if(e.metaEventLen) {
+        if(error = prvWriteVoid(pMidiFile->p, &e.params.msg, e.metaEventLen))
+          return error;
+      }
     }
   }
 
