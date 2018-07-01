@@ -436,7 +436,7 @@ static Error prvWriteTrackHeader(MidiFile* pMidiFile) {
   if(error = prvWriteVoid(pMidiFile->p, &chunkInfo, sizeof(MidiChunkInfo)))
     return error;
 
-  if (error = eMidi_fseek(pMidiFile->p, originalPos, SEEK_END))
+  if (error = eMidi_fseek(pMidiFile->p, originalPos, SEEK_SET))
     return error;
 }
 
