@@ -414,6 +414,32 @@ Error eMidi_writeSetTempoMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint
   return writeEvent(pMidiFile, &e);
 }
 
+static Error prvWriteTrackHeader(MidiFile* pMidiFile) {
+  int32_t originalPos = eMidi_ftell(pMidiFile->p);
+
+  Error error;
+
+  if (error = eMidi_fseek(pMidiFile->p, 0, SEEK_END))
+    return error;
+
+  int32_t fileSize = eMidi_ftell(pMidiFile->p);
+
+  if (error = eMidi_fseek(pMidiFile->p, sizeof(MidiChunkInfo) + sizeof(MidiHeader), SEEK_SET))
+    return error;
+
+  int32_t trackSize = fileSize - (2 * sizeof(MidiChunkInfo) + sizeof(MidiHeader));
+
+  MidiChunkInfo chunkInfo;
+  memcpy(chunkInfo.pChunk, "MTrk", 4);
+  chunkInfo.length = BSWAP_32(trackSize);
+
+  if(error = prvWriteVoid(pMidiFile->p, &chunkInfo, sizeof(MidiChunkInfo)))
+    return error;
+
+  if (error = eMidi_fseek(pMidiFile->p, originalPos, SEEK_END))
+    return error;
+}
+
 Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
   if(!pMidiFile)
     return EMIDI_INVALID_HANDLE;
@@ -445,7 +471,7 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
     return error;
 
   memcpy(chunkInfo.pChunk, "MTrk", 4);
-  chunkInfo.length = BSWAP_32(4); // TOOD: put correct track length here!
+  chunkInfo.length = 0;
 
   if(error = prvWriteVoid(p, &chunkInfo, sizeof(MidiChunkInfo)))
     return error;
@@ -492,6 +518,9 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
         return error;
     }
   }
+
+  if(error = prvWriteTrackHeader(pMidiFile))
+    return error;
 
   return EMIDI_OK;
 }
