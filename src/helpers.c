@@ -416,7 +416,7 @@ const char* eMidi_programToStr(uint8_t programNo) {
     case  57: return "Trumpet";
     case  58: return "Trombone";
     case  59: return "Tuba";
-    case  60: return " Muted Trumpet";
+    case  60: return "Muted Trumpet";
     case  61: return "French Horn";
     case  62: return "Brass Section";
     case  63: return "SynthBrass 1";
