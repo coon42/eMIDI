@@ -372,6 +372,16 @@ Error eMidi_writeNoteOnEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t ch
   return writeEvent(pMidiFile, &e);
 }
 
+Error eMidi_writeControlChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t control, uint8_t value) {
+  MidiEvent e = { 0 };
+  e.deltaTime = deltaTime;
+  e.eventId = MIDI_EVENT_CONTROL_CHANGE | (channel & 0x0F);
+  e.params.msg.controlChange.control = control;
+  e.params.msg.controlChange.value = value;
+
+  return writeEvent(pMidiFile, &e);
+}
+
 Error eMidi_writeProgramChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t programNumber) {
   MidiEvent e = { 0 };
   e.deltaTime = deltaTime;
