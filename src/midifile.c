@@ -365,9 +365,18 @@ static Error writeEvent(MidiFile* pMidiFile, const MidiEvent* pEvent) {
 Error eMidi_writeNoteOnEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t note, uint8_t velocity) {
   MidiEvent e = { 0 };
   e.deltaTime = deltaTime;
-  e.eventId = MIDI_EVENT_NOTE_ON;
+  e.eventId = MIDI_EVENT_NOTE_ON | (channel & 0x0F);
   e.params.msg.noteOn.note = note;
   e.params.msg.noteOn.velocity = velocity;
+
+  return writeEvent(pMidiFile, &e);
+}
+
+Error eMidi_writeProgramChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t programNumber) {
+  MidiEvent e = { 0 };
+  e.deltaTime = deltaTime;
+  e.eventId = MIDI_EVENT_PROGRAM_CHANGE | (channel & 0x0F);
+  e.params.msg.programChange.programNumber = programNumber;
 
   return writeEvent(pMidiFile, &e);
 }
@@ -431,8 +440,19 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
       return error;
 
     if(e.eventId != MIDI_EVENT_META) {
-      // TODO: use correct midi param len instead of hard coding 2!
-      if(error = error = prvWriteVoid(pMidiFile->p, &e.params.msg, 2))
+      uint8_t paramLen = 0;
+
+      switch(e.eventId & 0xF0) {
+        case MIDI_EVENT_NOTE_OFF:          paramLen = 2; break;
+        case MIDI_EVENT_NOTE_ON:           paramLen = 2; break;
+        case MIDI_EVENT_POLY_KEY_PRESSURE: paramLen = 2; break;
+        case MIDI_EVENT_CONTROL_CHANGE:    paramLen = 2; break;
+        case MIDI_EVENT_PROGRAM_CHANGE:    paramLen = 1; break;
+        case MIDI_EVENT_CHANNEL_PRESSURE:  paramLen = 1; break;
+        case MIDI_EVENT_PITCH_BEND:        paramLen = 2; break;
+      }
+
+      if(error = error = prvWriteVoid(pMidiFile->p, &e.params.msg, paramLen))
         return error;
     }
     else {
