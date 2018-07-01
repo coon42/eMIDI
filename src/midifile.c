@@ -362,6 +362,16 @@ static Error writeEvent(MidiFile* pMidiFile, const MidiEvent* pEvent) {
   return EMIDI_OK;
 }
 
+Error eMidi_writeNoteOffEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t note, uint8_t velocity) {
+  MidiEvent e = { 0 };
+  e.deltaTime = deltaTime;
+  e.eventId = MIDI_EVENT_NOTE_OFF | (channel & 0x0F);
+  e.params.msg.noteOn.note = note;
+  e.params.msg.noteOn.velocity = velocity;
+
+  return writeEvent(pMidiFile, &e);
+}
+
 Error eMidi_writeNoteOnEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t note, uint8_t velocity) {
   MidiEvent e = { 0 };
   e.deltaTime = deltaTime;
