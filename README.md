@@ -60,9 +60,10 @@ You will find some examples in **utils** directory:
 
 To play a MIDI file just execute
 
-<code>
-  bin/player tests/midis/cdefgabc_0.mid
-</code>
+```bash
+bin/player tests/midis/cdefgabc_0.mid
+```
+
 
 If you get an error like: 
 
@@ -72,39 +73,39 @@ You might need to install fluidsynth first:
 
 #### Install fluidsynth ####
 
-<code>
+```bash
 sudo pacman -S fluidsynth
-</code>
+```
 
 #### Install a soundfont ####
-<code>
+```bash
 sudo pacman -S soundfont-fluid
-</code>
+```
 
 #### Setup daemon for MIDI playback ####
-<code>
+```bash
 sudo vim /etc/conf.d/fluidsynth 
-</code>
+```
 
 Replace the contents by:
 
-<code>
+```
 SOUND_FONT=/usr/share/soundfonts/FluidR3_GM.sf2
 AUDIO_DRIVER=alsa
 OTHER_OPTS='-is -m alsa_seq -r 48000'
-</code>
+```
 
 #### Enable and start the fluidsynth daemon ####
 Create a file at 
-<code>
+```
 ~/.config/systemd/user/fluidsynth.service
-</code>
+```
 
 **You meight create the systemd/user directories first!**
 
 Insert the following content:
 
-<code>
+```ini
 [Unit]
 Description=FluidSynth launched in server mode
 After=sound.target
@@ -114,26 +115,28 @@ ExecStart=/usr/bin/fluidsynth -a pulseaudio -m alsa_seq -i -l -s -p FluidSynth /
 
 [Install]
 WantedBy=default.target
-</code>
+```
 
 Execute:
 
-<code>
+```bash
 systemctl --user start fluidsynth.service
 systemctl --user enable fluidsynth.service
-</code>
+```
 
 If /dev/sequencer is not showing up you also meight execute:
 
-<code>
+```bash
 sudo modprobe snd-seq-oss
-</code>
+```
 
 And let is start on each boot by opening 
 
-**/etc/modules-load.d/modules.conf**
+```
+/etc/modules-load.d/modules.conf
+```
 
 and adding:
-<code>
+```
 snd-seq-oss
-</code>
+```
