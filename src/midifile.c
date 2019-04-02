@@ -150,7 +150,7 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
 
   MidiHeader header;
 
-  if(error = error = prvReadVoid(p, &header, chunkInfo.length, &numBytesRead))
+  if(error = prvReadVoid(p, &header, chunkInfo.length, &numBytesRead))
     return error;
 
   header.format       = BSWAP_16(header.format);
@@ -469,7 +469,7 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
   memcpy(chunkInfo.pChunk, "MThd", 4);
   chunkInfo.length = BSWAP_32(6);
 
-  if(error = error = prvWriteVoid(p, &chunkInfo, sizeof(MidiChunkInfo)))
+  if(error = prvWriteVoid(p, &chunkInfo, sizeof(MidiChunkInfo)))
     return error;
 
   MidiHeader header;
@@ -477,7 +477,7 @@ Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
   header.ntrks        = BSWAP_16(1);
   header.division.raw = BSWAP_16(960); // TODO: Make division configurable by user
 
-  if(error = error = prvWriteVoid(p, &header, sizeof(MidiHeader)))
+  if(error = prvWriteVoid(p, &header, sizeof(MidiHeader)))
     return error;
 
   memcpy(chunkInfo.pChunk, "MTrk", 4);
