@@ -63,7 +63,7 @@ int main(int argc, char* pArgv[]) {
     uint32_t usToWait = (e.deltaTime * uspqn) / TQPN;
 
     // TODO: generate G1 gcode commands:
-    // usleep(usToWait);
+    usleep(usToWait);
     eMidi_printMidiEvent(&e);
 
   } while (!(e.eventId == MIDI_EVENT_META && e.metaEventId == MIDI_END_OF_TRACK));
