@@ -18,16 +18,16 @@ static void listDevices() {
   }
 
   int midiCount;
-  int status = ioctl(fd, SNDCTL_SEQ_NRMIDIS, &midiCount);
+  ioctl(fd, SNDCTL_SEQ_NRMIDIS, &midiCount);
 
   int synthCount;
-  status = ioctl(fd, SNDCTL_SEQ_NRSYNTHS, &synthCount);
+  ioctl(fd, SNDCTL_SEQ_NRSYNTHS, &synthCount);
 
   struct midi_info midiinfo;
 
   for (int i = 0; i < midiCount; i++) {
     midiinfo.device = i;
-    status = ioctl(fd, SNDCTL_MIDI_INFO, &midiinfo);
+    ioctl(fd, SNDCTL_MIDI_INFO, &midiinfo);
     printf("MIDI Port %d: %s\n", i, midiinfo.name);
   }
 
@@ -35,13 +35,19 @@ static void listDevices() {
 
   for (int i=0; i < synthCount; i++) {
     synthinfo.device = i;
-    status = ioctl(fd, SNDCTL_SYNTH_INFO, &synthinfo);
+    ioctl(fd, SNDCTL_SYNTH_INFO, &synthinfo);
     printf("Synth Port %d: %s\n", i, synthinfo.name);
   }
 }
 
 static Error play(MidiPlayer* pPlayer) {
-  while(eMidi_playerTick(pPlayer) == EMIDI_OK);
+  Error error;
+
+  do {
+    error = eMidi_playerTick(pPlayer);
+  } while (error == EMIDI_OK);
+
+  return error;
 }
 
 typedef struct MyContext {
