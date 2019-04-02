@@ -448,6 +448,8 @@ static Error prvWriteTrackHeader(MidiFile* pMidiFile) {
 
   if (error = eMidi_fseek(pMidiFile->p, originalPos, SEEK_SET))
     return error;
+
+  return EMIDI_OK;
 }
 
 Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
