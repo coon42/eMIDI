@@ -76,10 +76,11 @@ size_t eMidi_fwrite(const void* p, size_t size, size_t nmemb, FILE* pStream) {
 
 int eMidi_printf(const char* pFormat, ...) {
   va_list args;
+
   va_start(args, pFormat);
-
-  vprintf(pFormat, args);
-
+  int result = vprintf(pFormat, args);
   va_end(args);
+
+  return result;
 }
 
