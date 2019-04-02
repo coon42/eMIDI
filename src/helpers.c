@@ -509,7 +509,7 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
 
   uint8_t channelNo      = e->eventId & 0x0F;
   uint8_t channelMessage = e->eventId & 0xF0;
-  uint8_t systemMessage  = e->eventId;
+  // uint8_t systemMessage  = e->eventId; // TODO: uncomment on use
 
   switch(channelMessage) {
     case MIDI_EVENT_NOTE_OFF:
