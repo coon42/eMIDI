@@ -1,6 +1,6 @@
 CC  = gcc
 CXX = g++
-CFLAGS   = -std=c99
+CFLAGS   = -std=c99 -Wall -Wno-parentheses -Wno-unused-function
 CXXFLAGS = -std=c++17
 
 .PHONY: all clean test dump midiplayer player memplayer gcode midi2array create
