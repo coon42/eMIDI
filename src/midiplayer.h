@@ -11,6 +11,7 @@ typedef struct MidiPlayer {
   MidiEvent event;
   uint32_t uspqn;
   uint32_t lastReloadTimeUs;
+  int32_t carryUs;
   UserEventCallback_t pUserEventCallback;
   void* pContext;
 } MidiPlayer;

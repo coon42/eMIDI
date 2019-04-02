@@ -44,6 +44,7 @@ Error eMidi_openPlayer(MidiPlayer* pPlayer, const char* pFileName,
   static const uint32_t defaultBpm = 120;
 
   pPlayer->uspqn = c / defaultBpm;
+  pPlayer->carryUs = 0;
   pPlayer->pUserEventCallback = pUserEventCallback;
   pPlayer->pContext = pContext;
 
@@ -63,11 +64,14 @@ Error eMidi_playerTick(MidiPlayer* pPlayer) {
   Error error;
 
   uint32_t tqpn = pPlayer->midi.header.division.tqpn.TQPN;
-  uint32_t usToWait = (pPlayer->event.deltaTime * pPlayer->uspqn) / tqpn;
   uint32_t usPassed = eMidi_timeUs() - pPlayer->lastReloadTimeUs;
+  int32_t usToWait = (pPlayer->event.deltaTime * pPlayer->uspqn) / tqpn - pPlayer->carryUs;
 
-  if (usPassed < usToWait)
-    return EMIDI_OK;
+  if (usToWait > 0)
+    if (usPassed < usToWait)
+      return EMIDI_OK;
+
+  pPlayer->carryUs = usPassed - usToWait;
 
   if (error = shoot(pPlayer))
     return error;
