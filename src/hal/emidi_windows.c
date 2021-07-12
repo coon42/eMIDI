@@ -6,7 +6,7 @@
 #include <string.h>
 
 int eMidi_timeUs() {
-  return eMidi_halTimeUs();
+  return clock() * 1000;
 }
 
 FILE* eMidi_fopen(const char* pPathName, const char* pMode) {
