@@ -26,7 +26,7 @@ static void printTotalRuntime(MidiFile* pMidiFile) {
       return;
     }
 
-    usTotal += (e.deltaTime * uspqn) / pMidiFile->header.division.tqpn.TQPN;
+    usTotal += (e.deltaTime * uspqn) / pMidiFile->header.division.tpqn.TPQN;
 
     if(e.eventId == MIDI_EVENT_META) {
       if(e.metaEventId == MIDI_SET_TEMPO)
@@ -65,7 +65,7 @@ static void printMidiFileEvents(MidiFile* pMidiFile) {
         uspqn = e.params.msg.meta.setTempo.usPerQuarterNote;
     }
 
-    usTotal += (e.deltaTime * uspqn) / pMidiFile->header.division.tqpn.TQPN;
+    usTotal += (e.deltaTime * uspqn) / pMidiFile->header.division.tpqn.TPQN;
 
     char pBuf[64];
     usToTimeStr(usTotal, pBuf, sizeof(pBuf));

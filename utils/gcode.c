@@ -59,8 +59,8 @@ int main(int argc, char* pArgv[]) {
         uspqn = e.params.msg.meta.setTempo.usPerQuarterNote;
     }
 
-    uint32_t TQPN = midi.header.division.tqpn.TQPN;
-    uint32_t usToWait = (e.deltaTime * uspqn) / TQPN;
+    uint32_t TPQN = midi.header.division.tpqn.TPQN;
+    uint32_t usToWait = (e.deltaTime * uspqn) / TPQN;
 
     // TODO: generate G1 gcode commands:
     usleep(usToWait);

@@ -585,7 +585,7 @@ Error eMidi_printFileInfo(const MidiFile* pMidiFile) {
 
   switch(pMidiFile->header.division.format) {
     case DIVISION_TPQN:
-      eMidi_printf("Ticks per quarter note: %d\n", pMidiFile->header.division.tqpn.TQPN);
+      eMidi_printf("Ticks per quarter note: %d\n", pMidiFile->header.division.tpqn.TPQN);
       break;
 
     case DIVISION_SMPTE:

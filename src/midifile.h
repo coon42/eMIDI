@@ -34,8 +34,8 @@ typedef struct MidiHeader {
 
     struct {
       uint16_t
-      TQPN : 15;
-    } tqpn;
+      TPQN : 15;
+    } tpqn;
   } division;
 
 } MidiHeader;
