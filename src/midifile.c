@@ -550,8 +550,6 @@ static Error closeRead(MidiFile* pMidiFile) {
   if (!pMidiFile->p)
     return EMIDI_FILE_NOT_OPENED;
 
-  eMidi_fclose(pMidiFile->p);
-
   return EMIDI_OK;
 }
 
@@ -569,19 +567,34 @@ static Error closeCreate(MidiFile* pMidiFile) {
     free(p);
 
     p = pNext;
-  }
-    
-  eMidi_fclose(pMidiFile->p);
+  }     
 
   return EMIDI_OK;
 }
 
 Error eMidi_close(MidiFile* pMidiFile) {
+  Error error;
+
   switch(pMidiFile->mode) {
-    case MIDI_FILE_MODE_READ:   return closeRead(pMidiFile);
-    case MIDI_FILE_MODE_CREATE: return closeCreate(pMidiFile);
+    case MIDI_FILE_MODE_READ: {
+      if (error = closeRead(pMidiFile))
+        return error;
+
+      break;
+    }
+
+    case MIDI_FILE_MODE_CREATE: {
+      if (error = closeCreate(pMidiFile))
+        return error;
+
+      break;
+    }
+
+    default:
+      return EMIDI_INVALID_FILE_MODE;
   }
 
-  return EMIDI_INVALID_FILE_MODE;
-}
+  eMidi_fclose(pMidiFile->p);
 
+  return EMIDI_OK;
+}
