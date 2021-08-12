@@ -547,13 +547,19 @@ static Error closeRead(MidiFile* pMidiFile) {
   if (!pMidiFile)
     return EMIDI_INVALID_HANDLE;
 
-  if (pMidiFile->p)
-    eMidi_fclose(pMidiFile->p);
+  if (!pMidiFile->p)
+    return EMIDI_FILE_NOT_OPENED;
+
+  eMidi_fclose(pMidiFile->p);
 
   return EMIDI_OK;
 }
 
 static Error closeCreate(MidiFile* pMidiFile) {
+
+  if (!pMidiFile->p)
+    return EMIDI_FILE_NOT_OPENED;
+    
   MidiEventList* p = pMidiFile->pEventList;
 
   while(p) {
