@@ -570,6 +570,8 @@ static Error closeCreate(MidiFile* pMidiFile) {
 
     p = pNext;
   }
+    
+  eMidi_fclose(pMidiFile->p);
 
   return EMIDI_OK;
 }
