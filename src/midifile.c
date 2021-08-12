@@ -556,6 +556,8 @@ static Error closeRead(MidiFile* pMidiFile) {
 }
 
 static Error closeCreate(MidiFile* pMidiFile) {
+  if (!pMidiFile)
+    return EMIDI_INVALID_HANDLE;
 
   if (!pMidiFile->p)
     return EMIDI_FILE_NOT_OPENED;
