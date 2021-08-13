@@ -336,9 +336,13 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
 // Write-API
 //--------------------------------------------------------------------------------------------------
 
-Error eMidi_create(MidiFile* pMidiFile) {
+Error eMidi_create(MidiFile* pMidiFile, const char* pFileName) {
   memset(pMidiFile, 0, sizeof(MidiFile));
   pMidiFile->mode = MIDI_FILE_MODE_CREATE;
+  pMidiFile->p = eMidi_fopen(pFileName, "wb");
+
+  if (!pMidiFile->p)
+    return EMIDI_CANNOT_OPEN_FILE;
 
   return EMIDI_OK;
 }
@@ -452,18 +456,17 @@ static Error prvWriteTrackHeader(MidiFile* pMidiFile) {
   return EMIDI_OK;
 }
 
-Error eMidi_save(MidiFile* pMidiFile, const char* pFileName) {
+Error eMidi_save(MidiFile* pMidiFile) {
   if(!pMidiFile)
     return EMIDI_INVALID_HANDLE;
 
   if(pMidiFile->mode != MIDI_FILE_MODE_CREATE)
     return EMIDI_INVALID_FILE_MODE;
 
-  FILE* p = eMidi_fopen(pFileName, "wb");
-  pMidiFile->p = p;
+  if (!pMidiFile->p)
+    return EMIDI_FILE_NOT_OPENED;
 
-  if(!p)
-    return EMIDI_CANNOT_OPEN_FILE;
+  FILE* p = pMidiFile->p;
 
   Error error;
 
