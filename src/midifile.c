@@ -562,7 +562,7 @@ static Error closeCreate(MidiFile* pMidiFile) {
 
   if (!pMidiFile->p)
     return EMIDI_FILE_NOT_OPENED;
-    
+
   Error error;
 
   if (error = prvSaveMidiFile(pMidiFile))
@@ -575,7 +575,7 @@ static Error closeCreate(MidiFile* pMidiFile) {
     free(p);
 
     p = pNext;
-  }     
+  }
 
   return EMIDI_OK;
 }
