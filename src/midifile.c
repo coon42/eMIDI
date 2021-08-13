@@ -456,7 +456,7 @@ static Error prvWriteTrackHeader(MidiFile* pMidiFile) {
   return EMIDI_OK;
 }
 
-Error eMidi_save(MidiFile* pMidiFile) {
+static Error prvSaveMidiFile(MidiFile* pMidiFile) {
   if(!pMidiFile)
     return EMIDI_INVALID_HANDLE;
 
