@@ -563,6 +563,11 @@ static Error closeCreate(MidiFile* pMidiFile) {
   if (!pMidiFile->p)
     return EMIDI_FILE_NOT_OPENED;
     
+  Error error;
+
+  if (error = prvSaveMidiFile(pMidiFile))
+    return error;
+
   MidiEventList* p = pMidiFile->pEventList;
 
   while(p) {
