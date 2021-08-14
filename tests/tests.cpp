@@ -10,49 +10,41 @@ extern "C" {
 //       e.g. eMidi_create() followed by eMidi_readEvent()
 
 TEST_CASE("eMidi_open tests", "[open]") {
+  MidiFile midi;
+
   SECTION("providing NULL for pMidiFile and NULL for pFileName") {
     REQUIRE(eMidi_open(NULL, NULL) == EMIDI_INVALID_HANDLE);
   }
 
   SECTION("providing valid object for pMidiFile and NULL for pFileName") {
-    MidiFile midi;
-
     REQUIRE(eMidi_open(&midi, NULL) == EMIDI_CANNOT_OPEN_FILE);
   }
 
   SECTION("providing valid object for pMidiFile and file name of invalid MIDI file") {
-    MidiFile midi;
-
     REQUIRE(eMidi_open(&midi, "midis/invalid.mid") == EMIDI_INVALID_MIDI_FILE);
   }
 
   SECTION("providing valid object for pMidiFile and file name of valid MIDI 0 file") {
-    MidiFile midi;
-
     REQUIRE(eMidi_open(&midi, "midis/c4_0.mid") == EMIDI_OK);
   }
 
   SECTION("open valid MIDI 0 file and check for correct file mode") {
-    MidiFile midi;
-
     REQUIRE(eMidi_open(&midi, "midis/c4_0.mid") == EMIDI_OK);
     REQUIRE(midi.mode == MIDI_FILE_MODE_READ);
   }
 
   SECTION("Complete parsing of cdefgabc_0.mid without any error") {
-    MidiFile midi;
-
     REQUIRE(eMidi_open(&midi, "midis/cdefgabc_0.mid") == EMIDI_OK);
   }
 }
 
 TEST_CASE("eMidi_readEvent tests", "[open, readevent]") {
-  SECTION("Complete parsing of turkish_match0.mid without any error") {
-    MidiFile midi;
-    REQUIRE(eMidi_open(&midi, "midis/turkish_march0.mid") == EMIDI_OK);
+  MidiFile midi;
+  Error eror;
+  MidiEvent e;
 
-    Error eror;
-    MidiEvent e;
+  SECTION("Complete parsing of turkish_match0.mid without any error") {
+    REQUIRE(eMidi_open(&midi, "midis/turkish_march0.mid") == EMIDI_OK);
 
     do {
       REQUIRE(eMidi_readEvent(&midi, &e) == EMIDI_OK);
@@ -60,11 +52,7 @@ TEST_CASE("eMidi_readEvent tests", "[open, readevent]") {
   }
 
   SECTION("Complete parsing of vivaldi_spring0.mid without any error") {
-    MidiFile midi;
     REQUIRE(eMidi_open(&midi, "midis/vivaldi_spring0.mid") == EMIDI_OK);
-
-    Error eror;
-    MidiEvent e;
 
     do {
       REQUIRE(eMidi_readEvent(&midi, &e) == EMIDI_OK);
@@ -72,11 +60,7 @@ TEST_CASE("eMidi_readEvent tests", "[open, readevent]") {
   }
 
   SECTION("Complete parsing of child_in_time0.mid without any error") {
-    MidiFile midi;
     REQUIRE(eMidi_open(&midi, "midis/child_in_time0.mid") == EMIDI_OK);
-
-    Error eror;
-    MidiEvent e;
 
     do {
       REQUIRE(eMidi_readEvent(&midi, &e) == EMIDI_OK);
