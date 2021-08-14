@@ -550,6 +550,10 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
     eMidi_printf(" - [0x%02x] %s ", e->metaEventId, eMidi_metaEventToStr(e->metaEventId));
 
     switch(e->metaEventId) {
+      case MIDI_META_MIDI_CHANNEL_PREFIX:
+        eMidi_printf("(channel: %d)", e->params.msg.meta.midiChannelPrefix.channel);
+        break;
+
       case MIDI_SET_TEMPO:
         eMidi_printf("(%d bpm)", prvUspqn2bpm(e->params.msg.meta.setTempo.usPerQuarterNote));
         break;

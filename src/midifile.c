@@ -293,6 +293,17 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
         return error;
 
       switch(pEvent->metaEventId) {
+        case MIDI_META_MIDI_CHANNEL_PREFIX: {
+          uint8_t channel;
+
+          if (error = prvReadByte(pMidiFile->p, &channel, NULL))
+            return error;
+
+          pEvent->params.msg.meta.midiChannelPrefix.channel = channel;
+
+          break;
+        }
+
         case MIDI_META_MIDI_PORT: {
           uint8_t port;
 
