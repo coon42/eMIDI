@@ -84,12 +84,12 @@ typedef struct MidiStatusParams {
       } midiChannelPrefix;
 
       struct {
-        uint32_t usPerQuarterNote;
-      } setTempo;
-
-      struct {
         uint8_t port;
       } midiPort;
+
+      struct {
+        uint32_t usPerQuarterNote;
+      } setTempo;
     } meta;
   } msg;
 

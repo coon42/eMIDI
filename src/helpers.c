@@ -554,12 +554,12 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
         eMidi_printf("(channel: %d)", e->params.msg.meta.midiChannelPrefix.channel);
         break;
 
-      case MIDI_SET_TEMPO:
-        eMidi_printf("(%d bpm)", prvUspqn2bpm(e->params.msg.meta.setTempo.usPerQuarterNote));
-        break;
-
       case MIDI_META_MIDI_PORT:
         eMidi_printf("(port: %d)", e->params.msg.meta.midiPort.port);
+        break;
+
+      case MIDI_SET_TEMPO:
+        eMidi_printf("(%d bpm)", prvUspqn2bpm(e->params.msg.meta.setTempo.usPerQuarterNote));
         break;
 
       default:
