@@ -24,6 +24,15 @@ int main(int argc, char* pArgv[]) {
   if (error = eMidi_writeNoteOnEvent(&midi, 960, 0, 48, 0))
     return error;
 
+  if (error = eMidi_writeNoteOnEvent(&midi, 960, 0, 64, 0))
+    return error;
+
+  if (error = eMidi_writeNoteOnEvent(&midi, 960, 0, 96, 0))
+    return error;
+
+  if (error = eMidi_writeEndOfTrackMetaEvent(&midi, 0))
+    return error;
+
   if (error = eMidi_close(&midi)) {
     eMidi_printError(error);
     return 2;
