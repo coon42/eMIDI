@@ -113,7 +113,7 @@ typedef struct MidiFile {
   // Only used in read mode:
   uint32_t size;
   MidiTrack track;
-  uint8_t prevEventId;
+  uint8_t currentStatus;
 
   // Only used in write mode:
   MidiEventList* pEventList;

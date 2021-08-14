@@ -184,7 +184,7 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
   pMidiFile->track.startPos = eMidi_ftell(p);
   pMidiFile->track.pos = eMidi_ftell(p);
   pMidiFile->track.len = chunkInfo.length;
-  pMidiFile->prevEventId = 0;
+  pMidiFile->currentStatus = 0;
 
   return EMIDI_OK;
 }
@@ -206,11 +206,11 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
 
   if(pEvent->eventId & 0x80) {
     pEvent->isRunningStatus = false;
-    pMidiFile->prevEventId = pEvent->eventId;
+    pMidiFile->currentStatus = pEvent->eventId;
   }
   else {
     pEvent->isRunningStatus = true;
-    pEvent->eventId = pMidiFile->prevEventId;
+    pEvent->eventId = pMidiFile->currentStatus;
 
     // TODO: do not read first data byte again. Skip second read instead:
     eMidi_fseek(pMidiFile->p, -1, SEEK_CUR);
