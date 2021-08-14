@@ -416,6 +416,17 @@ Error eMidi_writeProgramChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uin
   return writeEvent(pMidiFile, &e);
 }
 
+Error eMidi_writeMidiChannelPrefixMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel) {
+  MidiEvent e = { 0 };
+  e.deltaTime = deltaTime;
+  e.eventId = MIDI_EVENT_META;
+  e.metaEventId = MIDI_META_MIDI_CHANNEL_PREFIX;
+  e.metaEventLen = 1;
+  e.params.msg.meta.midiChannelPrefix.channel = channel;
+
+  return writeEvent(pMidiFile, &e);
+}
+
 Error eMidi_writeEndOfTrackMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime) {
   MidiEvent e = { 0 };
   e.deltaTime = deltaTime;
