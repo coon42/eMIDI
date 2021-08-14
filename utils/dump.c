@@ -55,8 +55,7 @@ static void printMidiFileEvents(MidiFile* pMidiFile) {
 
   do {
     if(error = eMidi_readEvent(pMidiFile, &e)) {
-      printf("Error on reading event: [0x%02X] (Error %d: %s)\n",e.eventId, error,
-          eMidi_errorToStr(error));
+      printf("Error on reading event: 0x%X (%s)\n", error, eMidi_errorToStr(error));
       return;
     }
 
