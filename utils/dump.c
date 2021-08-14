@@ -21,9 +21,7 @@ static void printTotalRuntime(MidiFile* pMidiFile) {
 
   do {
     if(error = eMidi_readEvent(pMidiFile, &e)) {
-      printf("Error on reading event: [0x%02X] (Error %d: %s)\n",e.eventId, error,
-          eMidi_errorToStr(error));
-      return;
+       break;
     }
 
     usTotal += (e.deltaTime * uspqn) / pMidiFile->header.division.tpqn.TPQN;
