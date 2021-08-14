@@ -78,7 +78,7 @@ typedef struct MidiStatusParams {
       uint16_t value;
     } pitchBend;
 
-    struct {
+    union {
       struct {
         uint8_t channel;
       } midiChannelPrefix;
