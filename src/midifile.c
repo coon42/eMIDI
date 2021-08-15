@@ -378,6 +378,10 @@ static Error writeEvent(MidiFile* pMidiFile, const MidiEvent* pEvent) {
 }
 
 Error eMidi_writeNoteOffEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t note, uint8_t velocity) {
+  checkChannelParam(channel);
+  checkNoteParam(note);
+  checkVelocityParam(velocity);
+
   MidiEvent e = { 0 };
   e.deltaTime = deltaTime;
   e.eventId = MIDI_EVENT_NOTE_OFF | (channel & 0x0F);
@@ -388,6 +392,10 @@ Error eMidi_writeNoteOffEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t c
 }
 
 Error eMidi_writeNoteOnEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t note, uint8_t velocity) {
+  checkChannelParam(channel);
+  checkNoteParam(note);
+  checkVelocityParam(velocity);
+
   MidiEvent e = { 0 };
   e.deltaTime = deltaTime;
   e.eventId = MIDI_EVENT_NOTE_ON | (channel & 0x0F);
@@ -398,6 +406,9 @@ Error eMidi_writeNoteOnEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t ch
 }
 
 Error eMidi_writeControlChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t control, uint8_t value) {
+  checkChannelParam(channel);
+  checkControlParam(control);
+
   MidiEvent e = { 0 };
   e.deltaTime = deltaTime;
   e.eventId = MIDI_EVENT_CONTROL_CHANGE | (channel & 0x0F);
@@ -408,6 +419,8 @@ Error eMidi_writeControlChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uin
 }
 
 Error eMidi_writeProgramChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t programNumber) {
+  checkChannelParam(channel);
+
   MidiEvent e = { 0 };
   e.deltaTime = deltaTime;
   e.eventId = MIDI_EVENT_PROGRAM_CHANGE | (channel & 0x0F);
@@ -417,6 +430,8 @@ Error eMidi_writeProgramChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uin
 }
 
 Error eMidi_writeMidiChannelPrefixMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel) {
+  checkChannelParam(channel);
+
   MidiEvent e = { 0 };
   e.deltaTime = deltaTime;
   e.eventId = MIDI_EVENT_META;
@@ -438,6 +453,8 @@ Error eMidi_writeEndOfTrackMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime) {
 }
 
 Error eMidi_writeSetTempoMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint32_t bpm) {
+  checkBpmParam(bpm);
+
   static const uint32_t c = 60000000;
 
   MidiEvent e = { 0 };

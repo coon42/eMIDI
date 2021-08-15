@@ -19,6 +19,11 @@ enum {
   EMIDI_FILE_NOT_OPENED        = 0x1007,
 
   EMIDI_INVALID_PORT_INDEX     = 0x1100,
+  EMIDI_INVALID_CHANNEL        = 0x1200,
+  EMIDI_INVALID_NOTE           = 0x1201,
+  EMIDI_INVALID_VELOCITY       = 0x1202,
+  EMIDI_INVALID_CONTROL        = 0x1203,
+  EMIDI_INVALID_BPM            = 0x1204,
 
   // remove as soon as supported:
   EMIDI_FUNCTION_NOT_IMPLEMENTED      = 0x2000,
@@ -28,5 +33,11 @@ enum {
 };
 
 typedef uint32_t Error;
+
+#define checkChannelParam(channel) if (channel > 15) return EMIDI_INVALID_CHANNEL
+#define checkNoteParam(note) if (note > 127) return EMIDI_INVALID_NOTE
+#define checkVelocityParam(velocity) if (velocity > 127) return EMIDI_INVALID_VELOCITY
+#define checkControlParam(control) if (control > 127) return EMIDI_INVALID_CONTROL
+#define checkBpmParam(bpm) if (bpm == 0) return EMIDI_INVALID_BPM
 
 #endif // EMIDI_TYPES_H
