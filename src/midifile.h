@@ -123,6 +123,8 @@ typedef struct MidiFile {
   MidiEventList* pEventList;
 } MidiFile;
 
+#define MIDI_DEFAULT_VELOCITY 64
+
 enum MidiVoiceMessages {
   MIDI_EVENT_NOTE_OFF          = 0x80,
   MIDI_EVENT_NOTE_ON           = 0x90,
