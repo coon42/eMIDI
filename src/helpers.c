@@ -4,20 +4,31 @@
 
 const char* eMidi_errorToStr(Error error) {
   switch(error) {
-    case EMIDI_OK:                       return "Ok";
-    case EMIDI_OK_END_OF_FILE:           return "Ok, end of file";
-    case EMIDI_INVALID_HANDLE:           return "Invalid Handle";
-    case EMIDI_CANNOT_OPEN_FILE:         return "Cannot open file";
-    case EMIDI_INVALID_FILE_MODE:        return "Invalid file mode";
-    case EMIDI_INVALID_MIDI_FILE:        return "Invalid MIDI file";
-    case EMIDI_UNEXPECTED_END_OF_FILE:   return "Unexpected end of File";
-    case EMIDI_CANNOT_WRITE_TO_FILE:     return "Cannot write to file";
-    case EMIDI_SYNTAX_ERROR:             return "Syntax Error";
-    case EMIDI_FUNCTION_NOT_IMPLEMENTED: return "Function not implemented";
-    case EMIDI_FORMAT_1_NOT_SUPPORTED:   return "Format 1 not supported";
-    case EMIDI_FORMAT_2_NOT_SUPPORTED:   return "Format 2 not supported";
+    case EMIDI_OK:                            return "Ok";
+    case EMIDI_OK_END_OF_FILE:                return "Ok, end of file";
+    case EMIDI_OK_END_OF_PORTS:               return "Ok, end of ports";
+    case EMIDI_INVALID_HANDLE:                return "Invalid Handle";
+    case EMIDI_CANNOT_OPEN_FILE:              return "Cannot open file";
+    case EMIDI_INVALID_FILE_MODE:             return "Invalid file mode";
+    case EMIDI_INVALID_MIDI_FILE:             return "Invalid MIDI file";
+    case EMIDI_SYNTAX_ERROR:                  return "Syntax Error";
+    case EMIDI_UNEXPECTED_END_OF_FILE:        return "Unexpected end of File";
+    case EMIDI_CANNOT_WRITE_TO_FILE:          return "Cannot write to file";
+    case EMIDI_FILE_NOT_OPENED:               return "File not opened";
+                                              
+    case EMIDI_INVALID_PORT_INDEX:            return "Invalid port index";
+    case EMIDI_INVALID_CHANNEL:               return "Invalid channel";
+    case EMIDI_INVALID_NOTE:                  return "Invalid note";
+    case EMIDI_INVALID_VELOCITY:              return "Invalid velocity";
+    case EMIDI_INVALID_CONTROL:               return "Invalid control";
+    case EMIDI_INVALID_BPM:                   return "Invalid BPM";
+                                              
+    case EMIDI_FUNCTION_NOT_IMPLEMENTED:      return "Function not implemented";
+    case EMIDI_FORMAT_1_NOT_SUPPORTED:        return "Format 1 not supported";
+    case EMIDI_FORMAT_2_NOT_SUPPORTED:        return "Format 2 not supported";
+    case EMIDI_DIVISION_FORMAT_NOT_SUPPORTED: return "Division format not supported";
 
-    default:                             return "Unknown";
+    default:                                  return "Unknown";
   }
 }
 
