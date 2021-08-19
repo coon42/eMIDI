@@ -14,7 +14,7 @@ const char* eMidi_controllerToStr(uint8_t controllerNo);
 const char* eMidi_programToStr(uint8_t programNo);
 
 Error eMidi_printMidiEvent(const MidiEvent* e);
-Error eMidi_printError(Error error);
+void eMidi_printError(Error error);
 Error eMidi_printFileInfo(const MidiFile* pMidiFile);
 
 #endif // _HELPERS_H

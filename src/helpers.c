@@ -583,10 +583,8 @@ Error eMidi_printMidiEvent(const MidiEvent* e) {
   return EMIDI_OK;
 }
 
-Error eMidi_printError(Error error) {
-  eMidi_printf("Error %d: %s\n", error, eMidi_errorToStr(error));
-
-  return EMIDI_OK;
+void eMidi_printError(Error error) {
+  eMidi_printf("Error %d: %s\n", error, eMidi_errorToStr(error));  
 }
 
 Error eMidi_printFileInfo(const MidiFile* pMidiFile) {
