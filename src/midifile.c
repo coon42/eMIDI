@@ -11,8 +11,8 @@ static Error prvSkipBytes(FILE* p, int len) {
   return EMIDI_OK;
 }
 
-static Error prvReadVoid(FILE* p, void* pOut, int len, int* pNumBytesRead) {
-  int n = eMidi_fread(pOut, 1, len, p);
+static Error prvReadVoid(FILE* p, void* pOut, size_t len, size_t* pNumBytesRead) {
+  const size_t n = eMidi_fread(pOut, 1, len, p);
 
   if(pNumBytesRead)
     *pNumBytesRead = n;
@@ -23,15 +23,15 @@ static Error prvReadVoid(FILE* p, void* pOut, int len, int* pNumBytesRead) {
   return EMIDI_OK;
 }
 
-static Error prvReadByte(FILE* p, uint8_t* pOut, int* pNumBytesRead) {
+static Error prvReadByte(FILE* p, uint8_t* pOut, size_t* pNumBytesRead) {
   return prvReadVoid(p, pOut, sizeof(uint8_t), pNumBytesRead);
 }
 
-static Error prvReadWord(FILE* p, uint16_t* pOut, int* pNumBytesRead) {
+static Error prvReadWord(FILE* p, uint16_t* pOut, size_t* pNumBytesRead) {
   return prvReadVoid(p, pOut, sizeof(uint16_t), pNumBytesRead);
 }
 
-static Error prvReadDword(FILE* p, uint32_t* pOut, int* pNumBytesRead) {
+static Error prvReadDword(FILE* p, uint32_t* pOut, size_t* pNumBytesRead) {
   return prvReadVoid(p, pOut, sizeof(uint32_t), pNumBytesRead);
 }
 
@@ -61,8 +61,8 @@ static Error prvReadVarLen(FILE* p, uint32_t* pLen) {
   return EMIDI_OK;
 }
 
-static Error prvWriteVoid(FILE* p, const void* pData, int len) {
-  int n = eMidi_fwrite(pData, 1, len, p);
+static Error prvWriteVoid(FILE* p, const void* pData, size_t len) {
+  const size_t n = eMidi_fwrite(pData, 1, len, p);
 
   if(n < len)
     return EMIDI_CANNOT_WRITE_TO_FILE;
@@ -135,7 +135,7 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName) {
 
   MidiChunkInfo chunkInfo;
   Error error;
-  int32_t numBytesRead;
+  size_t numBytesRead;
 
   if(error = prvReadVoid(p, &chunkInfo, sizeof(MidiChunkInfo), &numBytesRead))
     return error;
