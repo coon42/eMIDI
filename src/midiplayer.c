@@ -64,7 +64,7 @@ Error eMidi_playerTick(MidiPlayer* pPlayer) {
   Error error;
 
   uint32_t tpqn = pPlayer->midi.header.division.tpqn.TPQN;
-  uint32_t usPassed = eMidi_timeUs() - pPlayer->lastReloadTimeUs;
+  int32_t usPassed = eMidi_timeUs() - pPlayer->lastReloadTimeUs;
   int32_t usToWait = (pPlayer->event.deltaTime * pPlayer->uspqn) / tpqn - pPlayer->carryUs;
 
   if (usToWait > 0)
