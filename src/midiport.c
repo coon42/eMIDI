@@ -41,7 +41,7 @@ static Error getPortName(char* pPortName, int nCount, PortType portType, int ind
 }
 
 static Error prvEnumPorts(uint32_t index, MidiPortInfo* pPortInfo, PortType portType) {
-  int numDevs = portType == IN_PORT ? midiInGetNumDevs() : midiOutGetNumDevs();
+  const uint32_t numDevs = portType == IN_PORT ? midiInGetNumDevs() : midiOutGetNumDevs();
 
   if (index >= numDevs)
     return EMIDI_OK_END_OF_PORTS;
@@ -83,7 +83,7 @@ Error eMidi_enumInPorts(uint32_t index, MidiPortInfo* pPortInfo) {
 }
 
 Error eMidi_openInPort(MidiInPort* pPort, uint32_t index, OnMidiMsgCallback_t callback, void* pCallbackArgs) {
-  int numDevs = midiInGetNumDevs();
+  const uint32_t numDevs = midiInGetNumDevs();
 
   if (index < 0 || index > numDevs - 1)
     return EMIDI_INVALID_PORT_INDEX;
