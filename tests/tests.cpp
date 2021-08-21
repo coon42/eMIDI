@@ -107,7 +107,7 @@ TEST_CASE("eMidi_create tests", "[create]") {
   MidiFile midi;
 
   SECTION("Create a MIDI file and directly close it again") {
-    REQUIRE(eMidi_create(&midi, "test.mid") == EMIDI_OK);
+    REQUIRE(eMidi_create(&midi, "test.mid", MIDI_DEFAULT_TPQN) == EMIDI_OK);
     REQUIRE(midi.mode == MIDI_FILE_MODE_CREATE);
     REQUIRE(eMidi_close(&midi) == EMIDI_OK);
   }
