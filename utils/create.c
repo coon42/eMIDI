@@ -4,7 +4,7 @@ int main(int argc, char* pArgv[]) {
   Error error;
   MidiFile midi;
 
-  if (error = eMidi_create(&midi, "example.mid")) {
+  if (error = eMidi_create(&midi, "example.mid", MIDI_DEFAULT_TPQN)) {
     eMidi_printError(error);
     return 1;
   }
