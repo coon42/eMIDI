@@ -185,7 +185,7 @@ Error eMidi_open(MidiFile* pMidiFile, const char* pFileName);
 Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent);
 
 // Write-API:
-Error eMidi_create(MidiFile* pMidiFile, const char* pFileName);
+Error eMidi_create(MidiFile* pMidiFile, const char* pFileName, uint16_t tpqn);
 Error eMidi_writeNoteOffEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t note, uint8_t velocity);
 Error eMidi_writeNoteOnEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t note, uint8_t velocity);
 Error eMidi_writeControlChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t control, uint8_t value);
@@ -198,4 +198,3 @@ Error eMidi_writeSetTempoMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint
 Error eMidi_close(MidiFile* pMidiFile);
 
 #endif // _MIDIFILE_H
-

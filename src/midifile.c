@@ -347,11 +347,18 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
 // Write-API
 //--------------------------------------------------------------------------------------------------
 
-Error eMidi_create(MidiFile* pMidiFile, const char* pFileName) {
+Error eMidi_create(MidiFile* pMidiFile, const char* pFileName, uint16_t tpqn) {
   memset(pMidiFile, 0, sizeof(MidiFile));
   pMidiFile->mode = MIDI_FILE_MODE_CREATE;
   pMidiFile->p = eMidi_fopen(pFileName, "wb");
 
+  pMidiFile->header.format = BSWAP_16(0); // TODO: also support format 1 and 2
+  pMidiFile->header.ntrks  = BSWAP_16(1);
+
+  pMidiFile->header.division.tpqn.TPQN = tpqn; // TODO: also support SMPTE
+  pMidiFile->header.division.format = 0;
+  pMidiFile->header.division.raw = BSWAP_16(pMidiFile->header.division.raw);
+    
   if (!pMidiFile->p)
     return EMIDI_CANNOT_OPEN_FILE;
 
@@ -515,13 +522,8 @@ static Error prvSaveMidiFile(MidiFile* pMidiFile) {
 
   if(error = prvWriteVoid(p, &chunkInfo, sizeof(MidiChunkInfo)))
     return error;
-
-  MidiHeader header;
-  header.format       = BSWAP_16(0);
-  header.ntrks        = BSWAP_16(1);
-  header.division.raw = BSWAP_16(960); // TODO: Make division configurable by user
-
-  if(error = prvWriteVoid(p, &header, sizeof(MidiHeader)))
+        
+  if(error = prvWriteVoid(p, &pMidiFile->header, sizeof(MidiHeader)))
     return error;
 
   memcpy(chunkInfo.pChunk, "MTrk", 4);
