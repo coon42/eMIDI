@@ -459,7 +459,7 @@ Error eMidi_writeEndOfTrackMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime) {
   return writeEvent(pMidiFile, &e);
 }
 
-Error eMidi_writeSetTempoMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint32_t bpm) {
+Error eMidi_writeSetTempoMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, float bpm) {
   checkBpmParam(bpm);
 
   static const uint32_t c = 60000000;
@@ -469,7 +469,7 @@ Error eMidi_writeSetTempoMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint
   e.eventId = MIDI_EVENT_META;
   e.metaEventId = MIDI_SET_TEMPO;
   e.metaEventLen = 3;
-  e.params.msg.meta.setTempo.usPerQuarterNote = c / bpm;
+  e.params.msg.meta.setTempo.usPerQuarterNote = (uint32_t)(c / bpm);
 
   return writeEvent(pMidiFile, &e);
 }

@@ -193,7 +193,7 @@ Error eMidi_writeControlChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uin
 Error eMidi_writeProgramChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t programNumber);
 Error eMidi_writeMidiChannelPrefixMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel);
 Error eMidi_writeEndOfTrackMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime);
-Error eMidi_writeSetTempoMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint32_t bpm);
+Error eMidi_writeSetTempoMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, float bpm); // TODO: avoid float
 
 // Common:
 Error eMidi_close(MidiFile* pMidiFile);
