@@ -110,6 +110,26 @@ private:
 };
 
 //-------------------------------------------------------------------------------------------------
+// EmPitchBendEvent
+//-------------------------------------------------------------------------------------------------
+
+class EmPitchBendEvent : public EmMidiEvent {
+public:
+  EmPitchBendEvent(MidiFile* pMidiFile, uint32_t absoluteTick, uint8_t channel, uint16_t pitchBendValue)
+      : EmMidiEvent(pMidiFile, MIDI_EVENT_PITCH_BEND, absoluteTick), channel_(channel),
+      pitchBendValue_(pitchBendValue) {}
+  
+  Error write(uint32_t deltaTime) const final;
+
+  uint8_t channel() const                     { return channel_; }
+  uint16_t pitchBendValue() const             { return pitchBendValue_; }
+
+private:
+  const uint8_t channel_;
+  const uint16_t pitchBendValue_;
+};
+
+//-------------------------------------------------------------------------------------------------
 // EmMetaEvent
 //-------------------------------------------------------------------------------------------------
 

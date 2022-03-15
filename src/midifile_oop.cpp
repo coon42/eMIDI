@@ -33,6 +33,14 @@ Error EmProgramChangeEvent::write(uint32_t deltaTime) const {
 }
 
 //-------------------------------------------------------------------------------------------------
+// EmPitchBendEvent
+//-------------------------------------------------------------------------------------------------
+
+Error EmPitchBendEvent::write(uint32_t deltaTime) const {
+  return eMidi_writePitchBendEvent(pMidiFile_, deltaTime, channel(), pitchBendValue());
+}
+
+//-------------------------------------------------------------------------------------------------
 // EmMetaSetTempoEvent
 //-------------------------------------------------------------------------------------------------
 
