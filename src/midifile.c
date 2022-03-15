@@ -370,10 +370,10 @@ static Error writeEvent(MidiFile* pMidiFile, const MidiEvent* pEvent) {
   pList->event = *pEvent;
   pList->pNext = NULL;
 
-  if(pMidiFile->pEventList) {
+  if (pMidiFile->pEventList) {
     MidiEventList* pLast;
 
-    for(pLast = pMidiFile->pEventList; pLast->pNext; pLast = pLast->pNext)
+    for (pLast = pMidiFile->pEventList; pLast->pNext; pLast = pLast->pNext)
       ; // Seek to end of list. TODO: save pointer to last entry somewhere instead of seeking
 
     pLast->pNext = pList;
