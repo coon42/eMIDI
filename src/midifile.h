@@ -51,10 +51,10 @@ typedef enum MidiFileMode {
   MIDI_FILE_MODE_CREATE
 } MidiFileMode;
 
-typedef struct MidiStatusParams {
-  uint8_t pRaw[2];
-
+typedef struct MidiStatusParams {  
   union {
+    uint8_t pRaw[2];
+
     struct {
       uint8_t note;
       uint8_t velocity;
