@@ -88,4 +88,35 @@ public:
   
   Error write(uint32_t deltaTime) const final;
 };
+
+//-------------------------------------------------------------------------------------------------
+// EmMetaEvent
+//-------------------------------------------------------------------------------------------------
+
+class EmMetaEvent : public EmMidiEvent {
+public:
+  EmMetaEvent(MidiFile* pMidiFile, uint8_t metaEventId, uint32_t absoluteTick)
+      : EmMidiEvent(pMidiFile, MIDI_EVENT_META, absoluteTick), metaEventId_(metaEventId) {}
+    
+  uint8_t metaEventId() const { return metaEventId_; }
+  Error write(uint32_t deltaTime) const override = 0;
+
+private:
+  const uint8_t metaEventId_;
+};
+
+//-------------------------------------------------------------------------------------------------
+// EmMetaNotImplementedEvent
+//-------------------------------------------------------------------------------------------------
+
+class EmMetaNotImplementedEvent : public EmMetaEvent {
+public:
+  EmMetaNotImplementedEvent(MidiFile* pMidiFile, uint8_t metaEventId, uint32_t absoluteTick)
+    : EmMetaEvent(pMidiFile, metaEventId, absoluteTick) {}
+  
+  Error write(uint32_t deltaTime) const final {
+    printf("EmMetaNotImplementedEvent::write()\n"); // TODO: remove
+    return EMIDI_OK;
+  }
+};
 #endif // MIDIFILE_OOP_H
