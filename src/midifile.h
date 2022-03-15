@@ -192,6 +192,7 @@ Error eMidi_writeNoteOffEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t c
 Error eMidi_writeNoteOnEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t note, uint8_t velocity);
 Error eMidi_writeControlChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t control, uint8_t value);
 Error eMidi_writeProgramChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint8_t programNumber);
+Error eMidi_writePitchBendEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint16_t pitchBendValue);
 Error eMidi_writeMidiChannelPrefixMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel);
 Error eMidi_writeEndOfTrackMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime);
 Error eMidi_writeSetTempoMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, float bpm); // TODO: avoid float

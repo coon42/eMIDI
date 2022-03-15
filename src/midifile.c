@@ -436,6 +436,19 @@ Error eMidi_writeProgramChangeEvent(MidiFile* pMidiFile, uint32_t deltaTime, uin
   return writeEvent(pMidiFile, &e);
 }
 
+Error eMidi_writePitchBendEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel, uint16_t pitchBendValue) {
+  checkChannelParam(channel);
+
+  MidiEvent e = { 0 };
+  e.deltaTime = deltaTime;
+  e.eventId = MIDI_EVENT_PITCH_BEND | (channel & 0x0F);
+
+  e.params.msg.pRaw[1] = (pitchBendValue >> 7) & 0x7F;
+  e.params.msg.pRaw[0] = pitchBendValue & 0x7F;
+      
+  return writeEvent(pMidiFile, &e);
+}
+
 Error eMidi_writeMidiChannelPrefixMetaEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t channel) {
   checkChannelParam(channel);
 
