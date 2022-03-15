@@ -119,4 +119,21 @@ public:
     return EMIDI_OK;
   }
 };
+
+//-------------------------------------------------------------------------------------------------
+// EmMetaSetTempoEvent
+//-------------------------------------------------------------------------------------------------
+
+class EmMetaSetTempoEvent : public EmMetaEvent {
+public:
+  EmMetaSetTempoEvent(MidiFile* pMidiFile, uint32_t absoluteTick, float bpm)
+      : EmMetaEvent(pMidiFile, MIDI_SET_TEMPO, absoluteTick), bpm_(bpm) {}
+  
+  Error write(uint32_t deltaTime) const final;
+  float bpm() const                         { return bpm_; }
+
+private:
+  const float bpm_;
+};
+
 #endif // MIDIFILE_OOP_H
