@@ -76,4 +76,16 @@ public:
   
   Error write(uint32_t deltaTime) const final;
 };
+
+//-------------------------------------------------------------------------------------------------
+// EmNoteOffEvent
+//-------------------------------------------------------------------------------------------------
+
+class EmNoteOffEvent : public EmNoteEvent {
+public:
+  EmNoteOffEvent(MidiFile* pMidiFile, uint32_t absoluteTick, uint8_t channel, uint8_t note, uint8_t velocity)
+      : EmNoteEvent(pMidiFile, MIDI_EVENT_NOTE_OFF, absoluteTick, channel, note, velocity) {}
+  
+  Error write(uint32_t deltaTime) const final;
+};
 #endif // MIDIFILE_OOP_H
