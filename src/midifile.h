@@ -123,6 +123,7 @@ typedef struct MidiFile {
   MidiEventList* pEventList;
 } MidiFile;
 
+#define MIDI_NUM_NOTES        128
 #define MIDI_DEFAULT_VELOCITY 64
 #define MIDI_DEFAULT_TPQN     960
 
