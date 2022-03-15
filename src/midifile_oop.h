@@ -66,18 +66,6 @@ private:
 };
 
 //-------------------------------------------------------------------------------------------------
-// EmNoteOnEvent
-//-------------------------------------------------------------------------------------------------
-
-class EmNoteOnEvent : public EmNoteEvent {
-public:
-  EmNoteOnEvent(MidiFile* pMidiFile, uint32_t absoluteTick, uint8_t channel, uint8_t note, uint8_t velocity)
-      : EmNoteEvent(pMidiFile, MIDI_EVENT_NOTE_ON, absoluteTick, channel, note, velocity) {}
-  
-  Error write(uint32_t deltaTime) const final;
-};
-
-//-------------------------------------------------------------------------------------------------
 // EmNoteOffEvent
 //-------------------------------------------------------------------------------------------------
 
@@ -85,6 +73,18 @@ class EmNoteOffEvent : public EmNoteEvent {
 public:
   EmNoteOffEvent(MidiFile* pMidiFile, uint32_t absoluteTick, uint8_t channel, uint8_t note, uint8_t velocity)
       : EmNoteEvent(pMidiFile, MIDI_EVENT_NOTE_OFF, absoluteTick, channel, note, velocity) {}
+  
+  Error write(uint32_t deltaTime) const final;
+};
+
+//-------------------------------------------------------------------------------------------------
+// EmNoteOnEvent
+//-------------------------------------------------------------------------------------------------
+
+class EmNoteOnEvent : public EmNoteEvent {
+public:
+  EmNoteOnEvent(MidiFile* pMidiFile, uint32_t absoluteTick, uint8_t channel, uint8_t note, uint8_t velocity)
+      : EmNoteEvent(pMidiFile, MIDI_EVENT_NOTE_ON, absoluteTick, channel, note, velocity) {}
   
   Error write(uint32_t deltaTime) const final;
 };
