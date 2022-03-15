@@ -90,6 +90,26 @@ public:
 };
 
 //-------------------------------------------------------------------------------------------------
+// EmProgramChangeEvent
+//-------------------------------------------------------------------------------------------------
+
+class EmProgramChangeEvent : public EmMidiEvent {
+public:
+  EmProgramChangeEvent(MidiFile* pMidiFile, uint32_t absoluteTick, uint8_t channel, uint8_t programNumber)
+      : EmMidiEvent(pMidiFile, MIDI_EVENT_PROGRAM_CHANGE, absoluteTick), channel_(channel),
+      programNumber_(programNumber) {}
+  
+  Error write(uint32_t deltaTime) const final;
+
+  uint8_t channel() const                     { return channel_; }
+  uint8_t programNumber() const               { return programNumber_; }
+
+private:
+  const uint8_t channel_;
+  const uint8_t programNumber_;
+};
+
+//-------------------------------------------------------------------------------------------------
 // EmMetaEvent
 //-------------------------------------------------------------------------------------------------
 

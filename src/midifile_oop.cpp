@@ -17,6 +17,14 @@ Error EmNoteOnEvent::write(uint32_t deltaTime) const {
 }
 
 //-------------------------------------------------------------------------------------------------
+// EmProgramChangeEvent
+//-------------------------------------------------------------------------------------------------
+
+Error EmProgramChangeEvent::write(uint32_t deltaTime) const {
+  return eMidi_writeProgramChangeEvent(pMidiFile_, deltaTime, channel(), programNumber());
+}
+
+//-------------------------------------------------------------------------------------------------
 // EmMetaSetTempoEvent
 //-------------------------------------------------------------------------------------------------
 
