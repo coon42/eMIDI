@@ -36,7 +36,7 @@ class EmNotImplementedEvent : public EmMidiEvent {
 public:
   EmNotImplementedEvent(MidiFile* pMidiFile, uint8_t eventId, uint32_t absoluteTick)
       : EmMidiEvent(pMidiFile, eventId, absoluteTick) {}
-  
+
   Error write(uint32_t deltaTime) const final {
     printf("EmNotImplementedEvent::write()\n"); // TODO: remove
     return EMIDI_OK;
@@ -52,7 +52,7 @@ public:
   EmNoteEvent(MidiFile* pMidiFile, uint8_t eventId, uint32_t absoluteTick, uint8_t channel, uint8_t note,
       uint8_t velocity)
     : EmMidiEvent(pMidiFile, eventId, absoluteTick), channel_(channel), note_(note), velocity_(velocity) {}
-  
+
   Error write(uint32_t deltaTime) const override = 0;
 
   uint8_t channel()  const                    { return channel_; }
@@ -73,7 +73,7 @@ class EmNoteOffEvent : public EmNoteEvent {
 public:
   EmNoteOffEvent(MidiFile* pMidiFile, uint32_t absoluteTick, uint8_t channel, uint8_t note, uint8_t velocity)
       : EmNoteEvent(pMidiFile, MIDI_EVENT_NOTE_OFF, absoluteTick, channel, note, velocity) {}
-  
+
   Error write(uint32_t deltaTime) const final;
 };
 
@@ -85,7 +85,7 @@ class EmNoteOnEvent : public EmNoteEvent {
 public:
   EmNoteOnEvent(MidiFile* pMidiFile, uint32_t absoluteTick, uint8_t channel, uint8_t note, uint8_t velocity)
       : EmNoteEvent(pMidiFile, MIDI_EVENT_NOTE_ON, absoluteTick, channel, note, velocity) {}
-  
+
   Error write(uint32_t deltaTime) const final;
 };
 
@@ -98,7 +98,7 @@ public:
   EmProgramChangeEvent(MidiFile* pMidiFile, uint32_t absoluteTick, uint8_t channel, uint8_t programNumber)
       : EmMidiEvent(pMidiFile, MIDI_EVENT_PROGRAM_CHANGE, absoluteTick), channel_(channel),
       programNumber_(programNumber) {}
-  
+
   Error write(uint32_t deltaTime) const final;
 
   uint8_t channel() const                     { return channel_; }
@@ -118,7 +118,7 @@ public:
   EmPitchBendEvent(MidiFile* pMidiFile, uint32_t absoluteTick, uint8_t channel, uint16_t pitchBendValue)
       : EmMidiEvent(pMidiFile, MIDI_EVENT_PITCH_BEND, absoluteTick), channel_(channel),
       pitchBendValue_(pitchBendValue) {}
-  
+
   Error write(uint32_t deltaTime) const final;
 
   uint8_t channel() const                     { return channel_; }
@@ -137,7 +137,7 @@ class EmMetaEvent : public EmMidiEvent {
 public:
   EmMetaEvent(MidiFile* pMidiFile, uint8_t metaEventId, uint32_t absoluteTick)
       : EmMidiEvent(pMidiFile, MIDI_EVENT_META, absoluteTick), metaEventId_(metaEventId) {}
-    
+
   uint8_t metaEventId() const { return metaEventId_; }
   Error write(uint32_t deltaTime) const override = 0;
 
@@ -153,7 +153,7 @@ class EmMetaNotImplementedEvent : public EmMetaEvent {
 public:
   EmMetaNotImplementedEvent(MidiFile* pMidiFile, uint8_t metaEventId, uint32_t absoluteTick)
     : EmMetaEvent(pMidiFile, metaEventId, absoluteTick) {}
-  
+
   Error write(uint32_t deltaTime) const final {
     printf("EmMetaNotImplementedEvent::write()\n"); // TODO: remove
     return EMIDI_OK;
@@ -168,7 +168,7 @@ class EmMetaSetTempoEvent : public EmMetaEvent {
 public:
   EmMetaSetTempoEvent(MidiFile* pMidiFile, uint32_t absoluteTick, float bpm)
       : EmMetaEvent(pMidiFile, MIDI_SET_TEMPO, absoluteTick), bpm_(bpm) {}
-  
+
   Error write(uint32_t deltaTime) const final;
   float bpm() const                         { return bpm_; }
 

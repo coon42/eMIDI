@@ -33,7 +33,7 @@ static void listDevices() {
 
   struct synth_info synthinfo;
 
-  for (int i=0; i < synthCount; i++) {
+  for (int i = 0; i < synthCount; i++) {
     synthinfo.device = i;
     ioctl(fd, SNDCTL_SYNTH_INFO, &synthinfo);
     printf("Synth Port %d: %s\n", i, synthinfo.name);
