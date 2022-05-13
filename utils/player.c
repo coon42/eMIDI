@@ -80,7 +80,7 @@ static void userEventCallback(const MidiEvent* pEvent, void* pContext) {
   write(pCtx->fd, packet, sizeof(packet));
 
   for(int i = 0; i < numParamBytes; ++i) {
-    packet[1] = pEvent->params.pRaw[i];
+    packet[1] = pEvent->params.msg.pRaw[i];
     write(pCtx->fd, packet, sizeof(packet));
   }
 }
