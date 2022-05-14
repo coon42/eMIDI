@@ -1,6 +1,6 @@
 CC  = gcc
 CXX = g++
-CFLAGS   = -std=c99 -Wall -Wno-parentheses -Wno-unused-function
+CFLAGS   = -std=c99 -Wall -Wno-parentheses -Wno-unused-function -I src -L lib
 CXXFLAGS = -std=c++17
 
 .PHONY: all clean test dump midiplayer player memplayer gcode midi2array create
@@ -10,6 +10,7 @@ all: dump midiplayer player memplayer gcode midi2array create
 clean:
 	rm -rf obj
 	rm -rf bin
+	rm -rf lib
 
 test: bin/tests
 	cd tests; ../bin/tests
@@ -27,39 +28,57 @@ obj:
 bin:
 	mkdir bin
 
-obj/emidi_memory.o: obj src/hal/emidi_memory.c
-	$(CC) $(CFLAGS) -Isrc -c src/hal/emidi_memory.c -o obj/emidi_memory.o
+lib:
+	mkdir lib
+
+################
+# Object Files #
+################
 
 obj/emidi_linux.o: obj src/hal/emidi_linux.c
-	$(CC) $(CFLAGS) -Isrc -c src/hal/emidi_linux.c -o obj/emidi_linux.o
-
-obj/midifile.o: obj src/midifile.c
-	$(CC) $(CFLAGS) -Isrc -c src/midifile.c -o obj/midifile.o
-
-obj/midiplayer.o: obj src/midiplayer.c
-	$(CC) $(CFLAGS) -Isrc -c src/midiplayer.c -o obj/midiplayer.o
+	$(CC) $(CFLAGS) -c src/hal/emidi_linux.c -o $@
 
 obj/helpers.o: obj src/helpers.c
-	$(CC) $(CFLAGS) -Isrc -c src/helpers.c -o obj/helpers.o
+	$(CC) $(CFLAGS) -c src/helpers.c -o $@
 
-bin/dump: bin obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/dump.c
-	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/dump.c -o bin/dump
+obj/midifile.o: obj src/midifile.c
+	$(CC) $(CFLAGS) -c src/midifile.c -o $@
 
-bin/player: bin obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_linux.o utils/player.c
-	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_linux.o utils/player.c -o bin/player
+obj/midiplayer.o: obj src/midiplayer.c
+	$(CC) $(CFLAGS) -c src/midiplayer.c -o $@
 
-bin/memplayer: bin obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_memory.o utils/player.c
-	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/midiplayer.o obj/helpers.o obj/emidi_memory.o utils/player.c -o bin/memplayer
+#######
+# Lib #
+#######
 
-bin/gcode: bin obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/gcode.c
-	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/gcode.c -o bin/gcode
+EMIDI_LIB_SRCS = emidi_linux.c helpers.c midifile.c midiplayer.c
+EMIDI_LIB_OBJS=$(patsubst %.c,obj/%.o,$(EMIDI_LIB_SRCS))
 
-bin/midi2array: bin obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/midi2array.c
-	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/midi2array.c -o bin/midi2array
+lib/libemidi.a: obj lib bin $(EMIDI_LIB_OBJS)
+	$(AR) -r $@ $(EMIDI_LIB_OBJS)
 
-bin/create: bin obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/create.c
-	$(CC) $(CFLAGS) -Isrc obj/midifile.o obj/helpers.o obj/emidi_linux.o utils/create.c -o bin/create
+###############
+# Executables #
+###############
 
-bin/tests: bin obj/midifile.o obj/emidi_linux.o tests/tests.cpp
-	$(CXX) $(CXXFLAGS) obj/midifile.o obj/emidi_linux.o tests/tests.cpp -o bin/tests
+bin/dump: lib/libemidi.a utils/dump.c
+	$(CC) $(CFLAGS) utils/dump.c -l:libemidi.a -o $@
+
+bin/player: lib/libemidi.a utils/player.c
+	$(CC) $(CFLAGS) utils/player.c -l:libemidi.a -o $@
+
+bin/memplayer: lib/libemidi.a utils/player.c
+	$(CC) $(CFLAGS) utils/player.c -l:libemidi.a -o $@
+
+bin/gcode: lib/libemidi.a utils/gcode.c
+	$(CC) $(CFLAGS) utils/gcode.c -l:libemidi.a -o $@
+
+bin/midi2array: lib/libemidi.a utils/midi2array.c
+	$(CC) $(CFLAGS) utils/midi2array.c -l:libemidi.a -o $@
+
+bin/create: lib/libemidi.a utils/create.c
+	$(CC) $(CFLAGS) utils/create.c -l:libemidi.a -o $@
+
+bin/tests: lib/libemidi.a tests/tests.cpp
+	$(CXX) $(CXXFLAGS) tests/tests.cpp -l:libemidi.a -o $@
 
