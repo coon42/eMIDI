@@ -1,7 +1,7 @@
 CC  = gcc
 CXX = g++
 CFLAGS   = -std=c99 -Wall -Wno-parentheses -Wno-unused-function -I src -L lib
-CXXFLAGS = -std=c++17
+CXXFLAGS = -std=c++17 -L lib
 
 .PHONY: all clean test dump midiplayer player memplayer gcode midi2array create
 
@@ -44,6 +44,9 @@ obj/helpers.o: obj src/helpers.c
 obj/midifile.o: obj src/midifile.c
 	$(CC) $(CFLAGS) -c src/midifile.c -o $@
 
+obj/midifile_oop.o: obj src/midifile_oop.cpp
+	$(CXX) $(CXXFLAGS) -c src/midifile_oop.cpp -o $@
+
 obj/midiplayer.o: obj src/midiplayer.c
 	$(CC) $(CFLAGS) -c src/midiplayer.c -o $@
 
@@ -51,8 +54,8 @@ obj/midiplayer.o: obj src/midiplayer.c
 # Lib #
 #######
 
-EMIDI_LIB_SRCS = emidi_linux.c helpers.c midifile.c midiplayer.c
-EMIDI_LIB_OBJS=$(patsubst %.c,obj/%.o,$(EMIDI_LIB_SRCS))
+EMIDI_LIB_SRCS = emidi_linux.c helpers.c midifile.c midifile_oop.cpp midiplayer.c
+EMIDI_LIB_OBJS= $(patsubst %.cpp,obj/%.o, $(patsubst %.c,obj/%.o,$(EMIDI_LIB_SRCS)))
 
 lib/libemidi.a: obj lib bin $(EMIDI_LIB_OBJS)
 	$(AR) -r $@ $(EMIDI_LIB_OBJS)
