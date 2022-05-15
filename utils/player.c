@@ -74,12 +74,12 @@ static void userEventCallback(const MidiEvent* pEvent, void* pContext) {
       return;
   }
 
-  uint8_t packet[4] = { SEQ_MIDIPUTC, 0, pCtx->devnum, 0 };
+  uint8_t packet[4] = {SEQ_MIDIPUTC, 0, pCtx->devnum, 0};
 
   packet[1] = pEvent->eventId;
   write(pCtx->fd, packet, sizeof(packet));
 
-  for(int i = 0; i < numParamBytes; ++i) {
+  for (int i = 0; i < numParamBytes; ++i) {
     packet[1] = pEvent->params.msg.pRaw[i];
     write(pCtx->fd, packet, sizeof(packet));
   }
@@ -92,12 +92,12 @@ int main(int argc, char* pArgv[]) {
   ctx.fd = open(pDevice, O_WRONLY, 0);
   ctx.devnum = 1;
 
-  if(ctx.fd < 0) {
+  if (ctx.fd < 0) {
     printf("Error: cannot open %s\n", pDevice);
     exit(1);
   }
 
-  if(argc < 2) {
+  if (argc < 2) {
     printf("Usage: player <midi file>");
 
     return 1;
@@ -108,7 +108,7 @@ int main(int argc, char* pArgv[]) {
   Error error;
   MidiPlayer player;
 
-  if(error = eMidi_openPlayer(&player, pMidiFileName, userEventCallback, &ctx)) {
+  if (error = eMidi_openPlayer(&player, pMidiFileName, userEventCallback, &ctx)) {
     printf("Cannot open file: '%s'\n", pMidiFileName);
     eMidi_printError(error);
 
@@ -117,10 +117,10 @@ int main(int argc, char* pArgv[]) {
 
   printf("Midi file '%s' opened successfully!\n", pMidiFileName);
 
-  if(error = play(&player))
+  if (error = play(&player))
     return error;
 
-  if(error = eMidi_closePlayer(&player))
+  if (error = eMidi_closePlayer(&player))
     return error;
 
   close(ctx.fd);
