@@ -358,7 +358,7 @@ Error eMidi_create(MidiFile* pMidiFile, const char* pFileName, uint16_t tpqn) {
   pMidiFile->header.division.tpqn.TPQN = tpqn; // TODO: also support SMPTE
   pMidiFile->header.division.format = 0;
   pMidiFile->header.division.raw = BSWAP_16(pMidiFile->header.division.raw);
-    
+
   if (!pMidiFile->p)
     return EMIDI_CANNOT_OPEN_FILE;
 
@@ -535,7 +535,7 @@ static Error prvSaveMidiFile(MidiFile* pMidiFile) {
 
   if(error = prvWriteVoid(p, &chunkInfo, sizeof(MidiChunkInfo)))
     return error;
-        
+
   if(error = prvWriteVoid(p, &pMidiFile->header, sizeof(MidiHeader)))
     return error;
 
