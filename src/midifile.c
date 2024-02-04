@@ -220,48 +220,48 @@ Error eMidi_readEvent(MidiFile* pMidiFile, MidiEvent* pEvent) {
 
   switch(pEvent->eventId & 0xF0) {
     case MIDI_EVENT_NOTE_OFF:
-      prvReadByte(pMidiFile->p, &pEvent->params.msg.pRaw[0], NULL);
-      prvReadByte(pMidiFile->p, &pEvent->params.msg.pRaw[1], NULL);
-      pEvent->params.msg.noteOff.note     = pEvent->params.msg.pRaw[0];
-      pEvent->params.msg.noteOff.velocity = pEvent->params.msg.pRaw[1];
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);
+      pEvent->params.msg.noteOff.note     = pEvent->params.pRaw[0];
+      pEvent->params.msg.noteOff.velocity = pEvent->params.pRaw[1];
       return EMIDI_OK; // TODO: DRY return code
 
     case MIDI_EVENT_NOTE_ON:
-      prvReadByte(pMidiFile->p, &pEvent->params.msg.pRaw[0], NULL);
-      prvReadByte(pMidiFile->p, &pEvent->params.msg.pRaw[1], NULL);
-      pEvent->params.msg.noteOn.note     = pEvent->params.msg.pRaw[0];
-      pEvent->params.msg.noteOn.velocity = pEvent->params.msg.pRaw[1];
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);
+      pEvent->params.msg.noteOn.note     = pEvent->params.pRaw[0];
+      pEvent->params.msg.noteOn.velocity = pEvent->params.pRaw[1];
       return EMIDI_OK; // TODO: DRY return code
 
     case MIDI_EVENT_POLY_KEY_PRESSURE:
-      prvReadByte(pMidiFile->p, &pEvent->params.msg.pRaw[0], NULL);
-      prvReadByte(pMidiFile->p, &pEvent->params.msg.pRaw[1], NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);
       // TODO: implement
       return EMIDI_OK; // TODO: DRY return code
 
     case MIDI_EVENT_CONTROL_CHANGE:
-      prvReadByte(pMidiFile->p, &pEvent->params.msg.pRaw[0], NULL);
-      prvReadByte(pMidiFile->p, &pEvent->params.msg.pRaw[1], NULL);
-      pEvent->params.msg.controlChange.control = pEvent->params.msg.pRaw[0];
-      pEvent->params.msg.controlChange.value   = pEvent->params.msg.pRaw[1];
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);
+      pEvent->params.msg.controlChange.control = pEvent->params.pRaw[0];
+      pEvent->params.msg.controlChange.value   = pEvent->params.pRaw[1];
       return EMIDI_OK; // TODO: DRY return code
 
     case MIDI_EVENT_PROGRAM_CHANGE:
-      prvReadByte(pMidiFile->p, &pEvent->params.msg.pRaw[0], NULL);
-      pEvent->params.msg.programChange.programNumber = pEvent->params.msg.pRaw[0];
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
+      pEvent->params.msg.programChange.programNumber = pEvent->params.pRaw[0];
       return EMIDI_OK; // TODO: DRY return code
 
     case MIDI_EVENT_CHANNEL_PRESSURE:
-      prvReadByte(pMidiFile->p, &pEvent->params.msg.pRaw[0], NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
       // TODO: implement
       return EMIDI_OK; // TODO: DRY return code
 
     case MIDI_EVENT_PITCH_BEND: {
-      prvReadByte(pMidiFile->p, &pEvent->params.msg.pRaw[0], NULL);
-      prvReadByte(pMidiFile->p, &pEvent->params.msg.pRaw[1], NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[0], NULL);
+      prvReadByte(pMidiFile->p, &pEvent->params.pRaw[1], NULL);
 
-      uint16_t pitchBendValue = pEvent->params.msg.pRaw[0];
-      pitchBendValue |= (pEvent->params.msg.pRaw[1] << 7);
+      uint16_t pitchBendValue = pEvent->params.pRaw[0];
+      pitchBendValue |= (pEvent->params.pRaw[1] << 7);
 
       pEvent->params.msg.pitchBend.value = pitchBendValue;
       return EMIDI_OK; // TODO: DRY return code
@@ -443,9 +443,9 @@ Error eMidi_writePitchBendEvent(MidiFile* pMidiFile, uint32_t deltaTime, uint8_t
   e.deltaTime = deltaTime;
   e.eventId = MIDI_EVENT_PITCH_BEND | (channel & 0x0F);
 
-  e.params.msg.pRaw[1] = (pitchBendValue >> 7) & 0x7F;
-  e.params.msg.pRaw[0] = pitchBendValue & 0x7F;
-      
+  e.params.pRaw[1] = (pitchBendValue >> 7) & 0x7F;
+  e.params.pRaw[0] = pitchBendValue & 0x7F;
+
   return writeEvent(pMidiFile, &e);
 }
 
